@@ -8,6 +8,14 @@ declare const __APP_COMMIT__: string;
 declare const __JINBEI_VERSION__: string;
 declare const __AIOSTREAMS_VERSION__: string;
 
+/** The list of the npm packages in the bundle and their licences, under the public path. */
+declare const __LICENSES_FILE__: string;
+
+declare let __webpack_public_path__: string;
+
+/** Languages with a catalog too little translated to offer. */
+declare const __UNFINISHED_LOCALES__: string[];
+
 /** A translation catalog, compiled by `@lingui/loader`. */
 declare module '*.po' {
   import type { Messages } from '@lingui/core';

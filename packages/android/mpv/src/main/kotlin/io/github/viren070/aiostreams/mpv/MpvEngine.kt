@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
+import io.github.viren070.aiostreams.libs.FallbackFont
 import io.github.viren070.aiostreams.playback.CacheBudget
 import io.github.viren070.aiostreams.playback.Change
 import io.github.viren070.aiostreams.playback.Engine
@@ -67,6 +68,7 @@ class MpvEngine(private val context: Context) : Engine {
     // Used on the calls thread only.
     private var filters: SoundFilters? = null
     private var subtitleScale: Double? = null
+    private var hwdec: String? = null
     private var ownFont = ""
     private val styled = HashMap<String, String>()
     private var statsPage: String? = null
@@ -98,7 +100,7 @@ class MpvEngine(private val context: Context) : Engine {
         dir.mkdirs()
         // mpv's TLS can't read Android's certificate store, so it gets a copy each start.
         File(dir, CA_BUNDLE).writeText(trustedRoots(context))
-        fallbackFont(context)
+        FallbackFont.file(context)
         copyFonts()
         val options = mapOf(
             "config" to "yes",
@@ -216,14 +218,16 @@ class MpvEngine(private val context: Context) : Engine {
 
     // TVs copy MediaCodec's frames back: some draw direct ones wrong, and they have no battery to save.
     override fun setSettings(settings: PlayerSettings) = calls.execute {
-        set(
-            "hwdec",
-            when {
-                !settings.hardwareDecoding -> "no"
-                tv -> "mediacodec-copy"
-                else -> "mediacodec,mediacodec-copy"
-            },
-        )
+        val hwdec = when {
+            !settings.hardwareDecoding -> "no"
+            tv -> "mediacodec-copy"
+            else -> "mediacodec,mediacodec-copy"
+        }
+        // Any setting sends them all, and setting it mid-file overrides the file's own choice.
+        if (hwdec != this.hwdec) {
+            this.hwdec = hwdec
+            set("hwdec", hwdec)
+        }
         set("audio-channels", settings.audioChannels.takeIf { it in setOf("stereo", "5.1", "7.1") } ?: "auto-safe")
         set("audio-spdif", settings.passthrough.joinToString(","))
         set("audio-delay", seconds(settings.audioDelayMs))
@@ -567,10 +571,6 @@ class MpvEngine(private val context: Context) : Engine {
         /** The user's own options, which mpv reads at start and on [reloadConfig]. */
         fun configFile(context: Context) = File(File(context.filesDir, "mpv"), "mpv.conf")
 
-        /** The font mpv draws subtitles in where a script's own fonts are missing. */
-        fun fallbackFont(context: Context): File =
-            File(File(context.filesDir, "mpv").apply { mkdirs() }, FONT).also { copyAsset(context, FONT, it) }
-
         /** Every certificate Android trusts, the user's own included, as PEM, for TLS outside Android's own. */
         fun trustedRoots(context: Context): String {
             val store = KeyStore.getInstance("AndroidCAStore").apply { load(null) }
@@ -588,13 +588,7 @@ class MpvEngine(private val context: Context) : Engine {
             }
         }
 
-        private fun copyAsset(context: Context, name: String, target: File) {
-            if (target.exists()) return
-            context.assets.open(name).use { input -> target.outputStream().use(input::copyTo) }
-        }
-
         private const val CA_BUNDLE = "cacert.pem"
-        private const val FONT = "subfont.ttf"
 
         private val STATS = listOf("frame-drop-count", "decoder-frame-drop-count", "vo-delayed-frame-count")
         private const val TAG = "mpv"
