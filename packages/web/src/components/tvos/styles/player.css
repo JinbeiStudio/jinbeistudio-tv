@@ -629,3 +629,59 @@ html[data-tvos-build] .UI-Modal__content[data-name='player-info'] {
   color: rgba(255, 255, 255, 0.9);
   text-shadow: 0 0.2vw 1vw rgba(0, 0, 0, 0.6);
 }
+
+/* Paused for a while: what's playing, set at the bottom left in the hero's type, as Apple TV's paused screen. */
+html[data-tvos-build] [data-ui='pause-screen'] {
+  align-items: flex-end;
+  background: rgba(0, 0, 0, 0.2);
+  /* The page gutter (5.7vw); its variable isn't set inside the player. */
+  padding: 0 5.7vw 6vw;
+}
+html[data-tvos-build] [data-ui='pause-screen'] > div:first-child {
+  background:
+    linear-gradient(to top, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.25) 45%, transparent 70%),
+    linear-gradient(to right, rgba(0, 0, 0, 0.55), transparent 55%);
+}
+html[data-tvos-build] [data-ui='pause-screen'] > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7vw;
+  max-width: 47vw;
+  padding-inline-start: 0;
+}
+html[data-tvos-build] [data-ui='pause-screen'] > div:last-child > * {
+  margin: 0;
+}
+html[data-tvos-build] [data-ui='pause-logo'] {
+  max-width: 24vw;
+  max-height: 9vw;
+  object-position: left bottom;
+  filter: drop-shadow(0 0.3vw 0.8vw rgba(0, 0, 0, 0.5));
+}
+html[data-tvos-build] [data-ui='pause-title'] {
+  font-size: 3.2vw;
+  font-weight: 700;
+  line-height: 1;
+}
+html[data-tvos-build] [data-ui='pause-screen'] > div:last-child > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3vw;
+  padding-top: 0.3vw;
+}
+html[data-tvos-build] [data-ui='pause-episode'] {
+  font-size: 1.1vw;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+}
+html[data-tvos-build] [data-ui='pause-episode-title'] {
+  font-size: 1.6vw;
+  font-weight: 600;
+}
+html[data-tvos-build] [data-ui='pause-overview'] {
+  max-width: 28vw;
+  font-size: 1.1vw;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.65);
+  -webkit-line-clamp: 3;
+}
