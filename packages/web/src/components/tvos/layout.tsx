@@ -12,7 +12,6 @@ import { navigate, to } from '../../lib/paths';
 import { toast } from 'sonner';
 import { watchForNewPage } from '../../lib/web-update';
 import { isTextField, runAction, useAction } from '../../lib/input';
-import { usePlaylistsOffered } from '../../lib/playlists';
 import { useServerEvents } from '../../lib/server-events';
 import { PageShown } from '../../lib/page-shown';
 import { markTvosStyle } from '../../lib/tvos-style';
@@ -174,7 +173,6 @@ export function TvosLayout() {
     select: (matches) => !!matches[0]?.pathname.startsWith('/play/'),
   });
   useServerEvents(playing);
-  const offersPlaylists = usePlaylistsOffered();
   // Menus and dialogs open outside the page, so the whole document says the tvOS style is on.
   // Left as the setting says when the layout goes (sign-out, who's watching), so those screens keep the look.
   React.useEffect(() => {
@@ -373,7 +371,7 @@ export function TvosLayout() {
         <VersionPickerProvider>
           <RemoteTarget />
           <RandomPick />
-          {offersPlaylists && <PlaylistsHost />}
+          <PlaylistsHost />
           {currentHost().watchNext && <WatchNextSync />}
           <ItemMenuHost>
             {!playing && (

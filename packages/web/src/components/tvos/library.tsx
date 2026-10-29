@@ -2,7 +2,6 @@
 import React from 'react';
 import { BiDownload, BiListUl } from 'react-icons/bi';
 import { useItemPages } from '../../lib/queries';
-import { usePlaylistsOffered } from '../../lib/playlists';
 import { downloadsHost } from '../../lib/downloads';
 import { navigate, to } from '../../lib/paths';
 import { openPlaylists } from '../playlists';
@@ -28,7 +27,6 @@ export function TvosLibrary({ kind }: { kind?: string }) {
     recursive: true,
   });
   const items = pages.data?.pages.flatMap((p) => p.Items ?? []) ?? [];
-  const playlists = usePlaylistsOffered();
   const downloads = !!downloadsHost();
   return (
     <div className="tv-page tv-list-page">
@@ -53,15 +51,13 @@ export function TvosLibrary({ kind }: { kind?: string }) {
             {tr(k.label)}
           </button>
         ))}
-        {playlists && (
-          <button
-            type="button"
-            className="tv-tab tv-tab-action"
-            onClick={() => openPlaylists()}
-          >
-            <BiListUl /> {tr('Playlists')}
-          </button>
-        )}
+        <button
+          type="button"
+          className="tv-tab tv-tab-action"
+          onClick={() => openPlaylists()}
+        >
+          <BiListUl /> {tr('Playlists')}
+        </button>
         {downloads && (
           <button
             type="button"
