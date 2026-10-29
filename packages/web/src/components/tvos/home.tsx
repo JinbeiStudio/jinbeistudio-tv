@@ -190,7 +190,7 @@ function Hero({
         {current && (
           <>
             <Logo item={current} />
-            <Meta item={current} />
+            <Meta item={current} max={3} />
             {current.Overview && (
               <div className="tv-overview">{current.Overview}</div>
             )}

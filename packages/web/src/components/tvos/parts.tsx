@@ -20,6 +20,7 @@ import type { BaseItemDto, BaseItemPerson } from '../../lib/types';
 import { RowScroller, useNear, watch } from '../../lib/use-in-view';
 import { Artwork } from '../cards';
 import { CachedImage } from '../cached-image';
+import { Scores, scoresOf } from '../scores';
 import { ItemMenu } from '../item-menu';
 import {
   ContextMenu,
@@ -526,8 +527,8 @@ export function Logo({ item }: { item: BaseItemDto }) {
   );
 }
 
-/** The details line as Apple's: kind, genres and year, then the rating in a frame. */
-export function Meta({ item }: { item: BaseItemDto }) {
+/** The details line as Apple's: kind, genres and year, each source's score, then the rating in a frame. */
+export function Meta({ item, max }: { item: BaseItemDto; max?: number }) {
   const parts: string[] = [];
   if (item.Type === 'Series') parts.push(tr('TV Show'));
   else if (item.Type === 'Movie') parts.push(tr('Movie'));
@@ -541,10 +542,16 @@ export function Meta({ item }: { item: BaseItemDto }) {
         : `${minutes}m`
     );
   }
-  if (item.CommunityRating) parts.push(`★ ${item.CommunityRating.toFixed(1)}`);
+  const scored = scoresOf(item).length > 0;
   return (
     <div className="tv-meta">
       {parts.join(' · ')}
+      {scored && (
+        <>
+          {parts.length > 0 && ' · '}
+          <Scores item={item} max={max} />
+        </>
+      )}
       {item.OfficialRating && (
         <span className="tv-rating">{item.OfficialRating}</span>
       )}
