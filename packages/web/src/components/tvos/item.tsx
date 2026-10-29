@@ -35,7 +35,7 @@ import { openRandom } from '../random-pick';
 import { openPartySheet } from '../party/party-sheet';
 import { openRemote } from '../remote-sheet';
 import { openAddToPlaylist } from '../playlists';
-import { playable, usePlaylistsOffered } from '../../lib/playlists';
+import { playable } from '../../lib/playlists';
 import { useParty } from '../../lib/party/party';
 import { useFeature } from '../../lib/server-info';
 import { fullTitle } from '../../lib/format';
@@ -152,7 +152,6 @@ export function TvosItem({
   const canDrop = useFeature('dropped');
   const inParty = !!useParty();
   const devices = useRemoteDevices();
-  const playlists = usePlaylistsOffered();
   const dropped = item?.UserData?.Likes === false;
   const played = !!item?.UserData?.Played;
   const favourite = !!item?.UserData?.IsFavorite;
@@ -347,7 +346,7 @@ export function TvosItem({
                     <BiCast />
                   </RoundAction>
                 )}
-                {playlists && item.Type === 'Movie' && playable(item) && (
+                {item.Type === 'Movie' && playable(item) && (
                   <RoundAction
                     label="Add to playlist"
                     onClick={() => openAddToPlaylist([item])}

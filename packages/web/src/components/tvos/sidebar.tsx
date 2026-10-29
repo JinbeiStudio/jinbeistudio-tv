@@ -18,7 +18,6 @@ import { useSession } from '../../lib/session';
 import { useOwnAvatar } from '../../lib/queries';
 import { navigate, to } from '../../lib/paths';
 import { downloadsHost } from '../../lib/downloads';
-import { usePlaylistsOffered } from '../../lib/playlists';
 import { useParty } from '../../lib/party/party';
 import { openPartySheet } from '../party/party-sheet';
 import { openPlaylists } from '../playlists';
@@ -95,7 +94,6 @@ export function Sidebar({
 }) {
   const { user, switchUser } = useSession();
   // The app's other sections, where it offers them.
-  const playlists = usePlaylistsOffered();
   const inParty = !!useParty();
   const sections: Section[] = [
     SECTIONS.home!,
@@ -104,9 +102,7 @@ export function Sidebar({
     SECTIONS.library!,
     SECTIONS.calendar!,
     SECTIONS.history!,
-    ...(playlists
-      ? [{ name: 'Playlists', icon: BiListUl, open: openPlaylists }]
-      : []),
+    { name: 'Playlists', icon: BiListUl, open: openPlaylists },
     {
       name: inParty ? 'Watch party' : 'Watch together',
       icon: BiGroup,
