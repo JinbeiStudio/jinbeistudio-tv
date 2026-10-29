@@ -54,7 +54,7 @@ html[data-tvos-build] .UI-DropdownMenu__item[data-highlighted] * {
   color: inherit !important;
 }
 html[data-tvos-build] .UI-DropdownMenu__separator,
-html[data-tvos-build] [data-ui='player-menu-footer'] {
+html[data-tvos-build] [data-ui='player-menu-pages'] {
   border-color: rgba(255, 255, 255, 0.12) !important;
 }
 html[data-tvos-build] .UI-DropdownMenu__root:focus-visible:not(#_),
