@@ -265,3 +265,9 @@ html[data-tvos-build] [data-ui='player-scrub'] > div {
 html[data-tvos-build] [data-ui='player-scrub'] > div {
   border-radius: 1.52vw !important;
 }
+
+/* A playlist's Shuffle or Repeat when on: a white circle with a dark icon, as Apple's toggles. */
+html[data-tvos-build] [data-ui='playlist-action'][data-active] {
+  background: rgba(255, 255, 255, 0.92) !important;
+  color: #000 !important;
+}
