@@ -42,6 +42,23 @@ html[data-tvos-build][data-tv] .tv-backdrop[data-lowered] {
 html[data-tvos-build][data-tv] .tv-backdrop[data-lowered] .tv-backdrop-blur {
   opacity: 1;
 }
+/* The copy has the shade drawn in and covers the rest, so once it is in they stop being drawn each frame; back up, they show at once under it. */
+html[data-tvos-build][data-tv] .tv-backdrop-blur {
+  z-index: 1;
+}
+html[data-tvos-build][data-tv] .tv-backdrop[data-lowered] img.tv-backdrop-layer,
+html[data-tvos-build][data-tv] .tv-backdrop[data-lowered]::after {
+  visibility: hidden;
+  transition:
+    opacity 0.6s ease,
+    visibility 0s linear 0.4s;
+}
+
+/* TVs: small glass inside the rows is a flat tint, as each blur there is redone on every focus move. */
+html[data-tvos-build][data-tv] :is(.tv-tag, .tv-watched) {
+  background-color: rgba(128, 130, 140, 0.42);
+  backdrop-filter: none;
+}
 
 /* Each artwork fades in over the last once decoded, as the app's hero. */
 .tv-backdrop img.tv-backdrop-layer {

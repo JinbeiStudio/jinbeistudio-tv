@@ -153,6 +153,8 @@ function edgeMove(e: PointerEvent) {
   let row: HTMLElement | null = null;
   let box: DOMRect | null = null;
   for (const el of edgeRows) {
+    // Home stays laid out, hidden and inert, under other pages: its rows would take the pointer first.
+    if (el.closest('[inert]')) continue;
     const r = el.getBoundingClientRect();
     if (e.clientY >= r.top && e.clientY <= r.bottom && r.width) {
       row = el;
@@ -498,6 +500,21 @@ function BlurredCopy({ src, active }: { src: string | null; active: boolean }) {
       const w = image.width * scale;
       const h = image.height * scale;
       ctx.drawImage(image, (width - w) / 2, (height - h) / 2, w, h);
+      // The backdrop's shade (.tv-backdrop::after), drawn in so the copy alone covers the screen.
+      ctx.filter = 'none';
+      const across = ctx.createLinearGradient(0, 0, width, 0);
+      across.addColorStop(0, 'rgba(0, 0, 0, 0.6)');
+      across.addColorStop(0.45, 'rgba(0, 0, 0, 0.15)');
+      across.addColorStop(0.7, 'rgba(0, 0, 0, 0)');
+      const down = ctx.createLinearGradient(0, 0, 0, height);
+      down.addColorStop(0, 'rgba(0, 0, 0, 0.3)');
+      down.addColorStop(0.25, 'rgba(0, 0, 0, 0)');
+      down.addColorStop(0.55, 'rgba(0, 0, 0, 0)');
+      down.addColorStop(1, 'rgba(0, 0, 0, 0.55)');
+      for (const shade of [across, down]) {
+        ctx.fillStyle = shade;
+        ctx.fillRect(0, 0, width, height);
+      }
     };
     image.src = src;
     return () => {
