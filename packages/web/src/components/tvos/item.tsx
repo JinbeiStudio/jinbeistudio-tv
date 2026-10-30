@@ -57,7 +57,11 @@ import { itemPath, navigate, to } from '../../lib/paths';
 import { formatLocale } from '../../lib/i18n';
 import { airsLine, linksFor } from '../../pages/item';
 import type { BaseItemDto } from '../../lib/types';
-import { PickOnArrival, useVersionPicker } from '../version-picker';
+import {
+  PickOnArrival,
+  usePreloadVersions,
+  useVersionPicker,
+} from '../version-picker';
 import { ItemMenu } from '../item-menu';
 import { upToIndex } from '../episodes';
 import {
@@ -159,6 +163,10 @@ export function TvosItem({
   const target: BaseItemDto | undefined = series
     ? (episodes.find((e) => e.Id === episodeId) ?? next ?? episodes[0])
     : item;
+  // Upstream's "Find versions when a title opens", for what Play would start.
+  usePreloadVersions(
+    target?.Type === 'Movie' || target?.Type === 'Episode' ? target : undefined
+  );
   const resumeMs = ticksToMs(target?.UserData?.PlaybackPositionTicks);
   const code =
     target?.Type === 'Episode' &&
