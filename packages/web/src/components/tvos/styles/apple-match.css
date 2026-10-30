@@ -16,6 +16,10 @@
   font-weight: 500;
   color: rgba(255, 255, 255, 0.85);
 }
+/* The scores sit on the text's line, not on their icons' baseline. */
+.tv-meta > span:has(> [data-ui='score']) {
+  vertical-align: -0.25em;
+}
 .tv-hero .tv-overview {
   max-width: 28vw;
   font-size: 1.1vw;
