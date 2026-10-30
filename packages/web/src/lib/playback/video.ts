@@ -274,8 +274,8 @@ export function videoEngine(
         delayMs = ms;
         shiftCues();
       },
-      setStyle({ subtitleStyle, lift }) {
-        line = subtitleLine(subtitleStyle, lift);
+      setStyle({ subtitleStyle, height }) {
+        line = subtitleLine(subtitleStyle, height);
         native?.setStyle(subtitleStyle);
         placeCues();
       },

@@ -796,6 +796,7 @@ export const settings = {
     autoPlayFirst: syncedFlag('autoPlayFirst', true, [
       'aiostreams-web-skip-versions',
     ]),
+    preloadVersions: syncedFlag('preloadVersions'),
     chapterSkips: syncedFlag('chapterSkips', true, [
       'aiostreams-desktop-chapter-skips',
     ]),
