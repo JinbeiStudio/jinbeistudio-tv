@@ -47,6 +47,7 @@ import {
 import {
   catalogName,
   isAnimeCatalog,
+  isForYouCatalog,
   isServiceLibrary,
   nameKind,
   tr,
@@ -97,6 +98,16 @@ export const TvosHome = React.memo(function TvosHome() {
   );
 });
 
+/** A "For you" pick with its synopsis alone: the model's reason before it is always English. */
+function withoutReason(item: BaseItemDto): BaseItemDto {
+  const overview = item.Overview ?? '';
+  const gap = overview.indexOf('\n\n');
+  // The model is asked for under 15 words; a longer first paragraph is the synopsis's own.
+  if (gap < 0 || gap > 160 || overview.slice(0, gap).includes('\n'))
+    return item;
+  return { ...item, Overview: overview.slice(gap + 2) };
+}
+
 function useCatalogs() {
   const views = useViews();
   const genreRequired = useFeature('genreRequired');
@@ -140,12 +151,17 @@ const Hero = React.memo(function Hero({
   const nextUp = useNextUp();
   const hero = React.useMemo(() => {
     const headOf = new Map(heroViews.map((view, i) => [view.Id, heads[i]]));
+    const forYou = new Set(
+      heroViews.filter(isForYouCatalog).map((view) => view.Id)
+    );
     const pick = (s: string) =>
       s === 'resume'
         ? mergeRows(resume.data?.Items, nextUp.data?.Items)
         : s === 'next-up'
           ? (nextUp.data?.Items ?? [])
-          : (headOf.get(s.slice(5))?.data?.Items ?? []);
+          : forYou.has(s.slice(5))
+            ? (headOf.get(s.slice(5))?.data?.Items ?? []).map(withoutReason)
+            : (headOf.get(s.slice(5))?.data?.Items ?? []);
     // Only what has artwork to fill the screen with.
     return interleave(
       sources.map((s) =>

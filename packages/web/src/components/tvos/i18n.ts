@@ -280,6 +280,11 @@ function catalogIds(view: CatalogView): string[] {
   return [found[1], found[1].replace(/_(?:movie|series|anime)$/, '')];
 }
 
+/** AIOMetadata's "For you" rows, whose synopses start with the model's reason for the pick. */
+export function isForYouCatalog(view: CatalogView): boolean {
+  return catalogIds(view).some((id) => id.startsWith('recommendations.'));
+}
+
 /** Whether the server says this catalog is anime, by its path or its id, whatever it is called. */
 export function isAnimeCatalog(view: CatalogView): boolean {
   if (view.Path?.startsWith('/aiostreams/anime/')) return true;
