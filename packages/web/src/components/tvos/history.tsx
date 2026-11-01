@@ -1,5 +1,6 @@
 /* eslint-disable lingui/no-unlocalized-strings -- the tvOS style's words go through tr() (./i18n), which this rule doesn't know */
 import React from 'react';
+import { BiHeart, BiMoviePlay, BiTimeFive, BiTv } from 'react-icons/bi';
 import { useInView } from '../../lib/use-in-view';
 import { useSession } from '../../lib/session';
 import { useFeature } from '../../lib/server-info';
@@ -71,15 +72,23 @@ export function TvosHistory() {
         favorites: own.favorites ?? 0,
       };
   const stats = [
-    counts.movies ? count(counts.movies, '{n} movie', '{n} movies') : null,
-    counts.episodes
-      ? count(counts.episodes, '{n} episode', '{n} episodes')
-      : null,
-    counts.inProgress ? tr('{n} in progress', { n: counts.inProgress }) : null,
-    counts.favorites
-      ? count(counts.favorites, '{n} favourite', '{n} favourites')
-      : null,
-  ].filter(Boolean);
+    counts.movies && {
+      icon: BiMoviePlay,
+      text: count(counts.movies, '{n} movie', '{n} movies'),
+    },
+    counts.episodes && {
+      icon: BiTv,
+      text: count(counts.episodes, '{n} episode', '{n} episodes'),
+    },
+    counts.inProgress && {
+      icon: BiTimeFive,
+      text: tr('{n} in progress', { n: counts.inProgress }),
+    },
+    counts.favorites && {
+      icon: BiHeart,
+      text: count(counts.favorites, '{n} favourite', '{n} favourites'),
+    },
+  ].filter((s) => !!s);
   const ownHistory = useOwnHistory(!full);
   const history = full ? fullHistory : ownHistory;
   const ownSessions = useOwnSessions(!full);
@@ -137,8 +146,9 @@ export function TvosHistory() {
       {stats.length > 0 && (
         <div className="tv-stats">
           {stats.map((s) => (
-            <span key={s} className="tv-tag">
-              {s}
+            <span key={s.text} className="tv-tag">
+              <s.icon />
+              {s.text}
             </span>
           ))}
         </div>

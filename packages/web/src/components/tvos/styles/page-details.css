@@ -236,6 +236,12 @@
 .tv-stats .tv-tag {
   margin: 0;
   font-size: 1vw;
+  gap: 0.4em;
+}
+.tv-stats .tv-tag svg {
+  flex: none;
+  font-size: 1.15em;
+  opacity: 0.85;
 }
 /* The app's microphone, beside the search field. */
 .tv-voice {
