@@ -696,6 +696,8 @@
   html[data-tvos-build]:not([data-tv]) [data-ui='settings-card-body'] {
     border-radius: 14px !important;
   }
+  /* At rest and under the pointer alike, or a hovered row resizes and flickers in and out of hover. */
+  html[data-tvos-build]:not([data-tv]) [data-ui='settings-card-item'],
   html[data-tvos-build]:not([data-tv]) [data-ui='settings-card-item']:hover {
     padding: 12px 16px !important;
   }
