@@ -594,13 +594,29 @@
     svg {
     font-size: 22px;
   }
+  /* History's counts beside its title, as the calendar's arrows: the page lays its first line out as two columns. */
+  html[data-tvos-build]:not([data-tv]) .tv-list-page:has(> .tv-stats) {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-list-page:has(> .tv-stats) > * {
+    grid-column: 1 / -1;
+  }
+  html[data-tvos-build]:not([data-tv])
+    .tv-list-page:has(> .tv-stats)
+    > .tv-page-title {
+    grid-column: 1;
+  }
   html[data-tvos-build]:not([data-tv]) .tv-stats {
+    grid-column: 2 !important;
     flex-wrap: wrap;
-    gap: 6px;
-    padding: 10px var(--tv-gutter) 0;
+    justify-content: flex-end;
+    gap: 5px;
+    padding: 0 var(--tv-gutter) 0 12px;
   }
   html[data-tvos-build]:not([data-tv]) .tv-stats .tv-tag {
-    font-size: 13px;
+    font-size: 11px;
   }
   /* The count level with the kind tag beside it, which sits a little low on the letters. */
   html[data-tvos-build]:not([data-tv]) .tv-page-title .tv-count {
