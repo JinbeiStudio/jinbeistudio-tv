@@ -31,6 +31,7 @@ import { BiChevronLeft, BiChevronRight } from 'react-icons/bi';
 import { MenuOpener, Pinned, Sea } from './parts';
 import { tr } from './i18n';
 import { Sidebar } from './sidebar';
+import { TabBar, isTabRoot, useSwipeBack } from './tabbar';
 import { TvosOutlet } from './routes';
 
 const TvosHome = React.lazy(() =>
@@ -134,6 +135,7 @@ function BackButton({
       data-label={tr('Back')}
       data-tip="below"
       className="tv-glass tv-menu-button tv-back"
+      data-tab-root={isTabRoot(pathname) ? '' : undefined}
       onClick={onBack}
     >
       <BiChevronLeft />
@@ -261,6 +263,7 @@ export function TvosLayout() {
   const [sidebar, setSidebar] = React.useState(false);
   const closeSidebar = React.useCallback(() => setSidebar(false), []);
   const openSidebar = React.useCallback(() => setSidebar(true), []);
+  const toggleSidebar = React.useCallback(() => setSidebar((o) => !o), []);
   React.useEffect(() => setSidebar(false), [pathname, playing]);
   // Marks the page while the sidebar is open: the glass behind it goes flat on TVs (ambient.css), redone each frame otherwise.
   React.useEffect(() => {
@@ -387,7 +390,7 @@ export function TvosLayout() {
     const away = (e: PointerEvent) => {
       if (
         !(e.target as Element | null)?.closest(
-          '.tv-sidebar, .tv-menu-button, .tv-edge-capsule'
+          '.tv-sidebar, .tv-menu-button, .tv-edge-capsule, .tv-tabbar-more'
         )
       )
         setSidebar(false);
@@ -401,6 +404,10 @@ export function TvosLayout() {
   }, [sidebar]);
   useRowMoveMark();
   usePlayerUpHides();
+  const swipeBack = React.useCallback(() => {
+    if (router.history.canGoBack()) router.history.back();
+  }, [router]);
+  useSwipeBack(swipeBack, !onHome && !playing && !sidebar);
   // The other pages' code fetched while idle, so a slow TV doesn't fetch it as one opens or playback starts.
   React.useEffect(() => {
     const warm = () => {
@@ -460,6 +467,13 @@ export function TvosLayout() {
           {offersPlaylists && <PlaylistsHost />}
           {currentHost().watchNext && <WatchNextSync />}
           <ItemMenuHost>
+            {!playing && !currentHost().tv && (
+              <TabBar
+                pathname={pathname}
+                moreOpen={sidebar}
+                onMore={toggleSidebar}
+              />
+            )}
             {!playing && (
               <Sidebar
                 open={sidebar}

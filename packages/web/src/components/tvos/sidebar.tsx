@@ -203,6 +203,7 @@ export function Sidebar({
             key={s.name}
             type="button"
             className="tv-sidebar-item"
+            data-section={s.name}
             data-current={s.match?.(pathname) ? '' : undefined}
             onClick={() => go(s)}
           >

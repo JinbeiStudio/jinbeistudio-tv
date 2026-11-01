@@ -280,6 +280,8 @@ html[data-tvos-build] [data-ui='settings-tab']:focus-visible {
 }
 html[data-tvos-build] [data-ui='settings-tab'] svg {
   font-size: 1.5vw;
+  /* The app nudges it on hover; tvOS lists hold still. */
+  transform: none !important;
 }
 html[data-tvos-build] [data-ui='settings-card-title'] {
   font-size: 1.3vw;
@@ -367,11 +369,12 @@ html[data-tvos-build] [data-ui='settings-card-item']:focus-within:not(:has(.UI-S
   background: rgba(255, 255, 255, 0.95) !important;
   color: #000;
 }
-html[data-tvos-build] [data-ui='settings-card-item'] p.font-semibold {
-  font-size: max(14px, 1.25vw);
-}
 html[data-tvos-build] [data-ui='settings-card-item'] .text-sm {
   font-size: max(12px, 0.98vw);
+}
+/* A row's title is a plain line, a switch's label or a field's label by kind of setting: one size for all three. */
+html[data-tvos-build] [data-ui='settings-card-item'] :is(p.font-semibold, .UI-Switch__label, .UI-BasicField__fieldLabel) {
+  font-size: max(14px, 1.25vw);
 }
 html[data-tvos-build] [data-ui='settings-card-item']:focus-within:not(:has(.UI-Select__root, .UI-Input__root, .UI-NumberInput__root, .UI-Textarea__root)) :is(p, span, label) {
   color: inherit !important;

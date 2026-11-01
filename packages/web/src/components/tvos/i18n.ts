@@ -15,6 +15,7 @@ const FR: Record<string, string> = {
   // Sidebar and pages
   Home: 'Accueil',
   Menu: 'Menu',
+  More: 'Plus',
   Back: 'Retour',
   'A new version is available': 'Une nouvelle version est disponible',
   Reload: 'Recharger',
