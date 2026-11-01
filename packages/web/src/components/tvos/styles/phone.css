@@ -810,23 +810,15 @@
   html[data-tvos-build]:not([data-tv]) .UI-ContextMenu__separator {
     margin: 4px;
   }
-  html[data-tvos-build]:not([data-tv]) .UI-Drawer__content.bottom-0 {
-    left: 8px !important;
-    right: 8px !important;
-    bottom: max(var(--tv-phone-safe-bottom), 8px) !important;
-    border-radius: 28px !important;
-  }
+  /* Every side sheet rises from the foot, as an iOS sheet: the screen is too narrow for one at the side. */
   html[data-tvos-build]:not([data-tv])
-    :is(.UI-Drawer__content.start-0, .UI-Drawer__content.end-0) {
-    top: calc(var(--tv-phone-safe-top) + 8px) !important;
-    bottom: 8px !important;
-    border-radius: 24px !important;
-  }
-  html[data-tvos-build]:not([data-tv]) .UI-Drawer__content.start-0 {
-    inset-inline-start: 8px !important;
-  }
-  html[data-tvos-build]:not([data-tv]) .UI-Drawer__content.end-0 {
-    inset-inline-end: 8px !important;
+    .UI-Drawer__content:is(.start-0, .end-0, .bottom-0) {
+    inset: auto 8px max(var(--tv-phone-safe-bottom), 8px) 8px !important;
+    width: auto !important;
+    max-width: none !important;
+    height: auto !important;
+    max-height: calc(100svh - var(--tv-phone-safe-top) - 16px) !important;
+    border-radius: 28px !important;
   }
   html[data-tvos-build]:not([data-tv])
     :is(.UI-Drawer__title, .UI-Modal__title) {
