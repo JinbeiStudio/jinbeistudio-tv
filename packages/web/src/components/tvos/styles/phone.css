@@ -422,12 +422,11 @@
   }
 
   /* Pages: iOS's large title at the top; under the Back button where there is one. */
-  html[data-tvos-build]:not([data-tv])
-    :is(.tv-list-page, .tv-search, .tv-calendar) {
+  html[data-tvos-build]:not([data-tv]) :is(.tv-list-page, .tv-search) {
     padding-top: calc(var(--tv-phone-safe-top) + 16px);
   }
   html[data-tvos-build]:not([data-tv]):has(.tv-back:not([data-tab-root]))
-    :is(.tv-list-page, .tv-search, .tv-calendar) {
+    :is(.tv-list-page, .tv-search) {
     padding-top: calc(var(--tv-phone-safe-top) + 62px);
   }
   html[data-tvos-build]:not([data-tv]) .tv-page-title,
@@ -624,9 +623,21 @@
   }
 
   /* Calendar. */
+  /* The app's own page inside: its body alone is padded, at the top as a tab's page (no Back). */
   html[data-tvos-build]:not([data-tv]) .tv-calendar {
-    padding-left: var(--tv-gutter);
-    padding-right: var(--tv-gutter);
+    padding: 0;
+  }
+  /* Today is a label, as the days' own; its rule across the list read as a stray bar. */
+  html[data-tvos-build]:not([data-tv])
+    [data-ui='calendar-today-line']
+    > span:last-child {
+    display: none;
+  }
+  html[data-tvos-build]:not([data-tv])
+    [data-tvos]
+    .tv-calendar
+    [data-ui='page-body'] {
+    padding: calc(var(--tv-phone-safe-top) + 16px) var(--tv-gutter) 24px !important;
   }
   html[data-tvos-build]:not([data-tv]) .tv-calendar [data-ui='calendar-grid'] {
     padding: 6px;
