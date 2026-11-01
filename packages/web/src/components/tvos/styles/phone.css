@@ -594,7 +594,7 @@
     svg {
     font-size: 22px;
   }
-  /* History's counts beside its title, as the calendar's arrows: the page lays its first line out as two columns. */
+  /* History: who's watching beside the title, swiping sideways, and the counts on the line under them. */
   html[data-tvos-build]:not([data-tv]) .tv-list-page:has(> .tv-stats) {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
@@ -606,17 +606,22 @@
   html[data-tvos-build]:not([data-tv])
     .tv-list-page:has(> .tv-stats)
     > .tv-page-title {
-    grid-column: 1;
+    grid-area: 1 / 1;
   }
-  html[data-tvos-build]:not([data-tv]) .tv-stats {
-    grid-column: 2 !important;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: 5px;
+  html[data-tvos-build]:not([data-tv])
+    .tv-list-page:has(> .tv-stats)
+    > .tv-tabs {
+    grid-area: 1 / 2;
     padding: 0 var(--tv-gutter) 0 12px;
   }
+  html[data-tvos-build]:not([data-tv]) .tv-stats {
+    grid-row: 2;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 10px var(--tv-gutter) 0;
+  }
   html[data-tvos-build]:not([data-tv]) .tv-stats .tv-tag {
-    font-size: 11px;
+    font-size: 12px;
   }
   /* The count level with the kind tag beside it, which sits a little low on the letters. */
   html[data-tvos-build]:not([data-tv]) .tv-page-title .tv-count {
