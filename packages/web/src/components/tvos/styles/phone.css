@@ -14,6 +14,8 @@
     --tv-phone-safe-top: env(safe-area-inset-top, 0px);
     --tv-phone-safe-bottom: env(safe-area-inset-bottom, 0px);
     --tv-phone-bar: calc(64px + max(var(--tv-phone-safe-bottom), 10px));
+    /* Two and a half posters across a row, as the Apple TV app shows on iPhone. */
+    --tv-phone-poster: min(calc((100vw - 36px) / 2.5), 170px);
     -webkit-tap-highlight-color: transparent;
   }
   html[data-tvos-build]:not([data-tv]) [data-tvos] {
@@ -329,8 +331,8 @@
     border-radius: 10px;
   }
   html[data-tvos-build]:not([data-tv]) .tv-poster .tv-art {
-    width: 112px;
-    height: 168px;
+    width: var(--tv-phone-poster);
+    height: calc(var(--tv-phone-poster) * 1.5);
   }
   html[data-tvos-build]:not([data-tv]) .tv-wide .tv-art {
     width: min(72vw, 300px);
@@ -338,7 +340,7 @@
     aspect-ratio: 16 / 9;
   }
   html[data-tvos-build]:not([data-tv]) .tv-caption {
-    width: 112px;
+    width: var(--tv-phone-poster);
     font-size: 13px;
   }
   html[data-tvos-build]:not([data-tv]) .tv-overlay {
@@ -477,7 +479,7 @@
     width: 8px;
   }
   html[data-tvos-build]:not([data-tv]) .tv-card-hold[data-shape='poster'] {
-    width: 112px;
+    width: var(--tv-phone-poster);
   }
   html[data-tvos-build]:not([data-tv]) .tv-card-hold[data-shape='wide'] {
     width: min(72vw, 300px);
