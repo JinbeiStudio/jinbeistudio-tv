@@ -607,19 +607,14 @@
     position: relative;
     top: 2px;
   }
-  /* A page's actions at the right of its title, as in an iOS navigation bar; under it when there's no room. */
+  /* A long title and its tag wrap rather than run off the screen. */
   html[data-tvos-build]:not([data-tv]) .tv-page-title {
     flex-wrap: wrap;
     gap: 8px;
   }
+  /* History's Export and Reset are left off phones, by choice. */
   html[data-tvos-build]:not([data-tv]) .tv-title-actions {
-    gap: 8px;
-    margin: 0 0 0 auto;
-  }
-  html[data-tvos-build]:not([data-tv]) .tv-title-actions button {
-    height: 34px !important;
-    padding: 0 12px !important;
-    font-size: 14px !important;
+    display: none;
   }
 
   /* Calendar. */
@@ -627,10 +622,8 @@
   html[data-tvos-build]:not([data-tv]) .tv-calendar {
     padding: 0;
   }
-  /* Today is a label, as the days' own; its rule across the list read as a stray bar. */
-  html[data-tvos-build]:not([data-tv])
-    [data-ui='calendar-today-line']
-    > span:last-child {
+  /* No Today marker in the phone list, by choice: the days are labelled. */
+  html[data-tvos-build]:not([data-tv]) [data-ui='calendar-today-line'] {
     display: none;
   }
   html[data-tvos-build]:not([data-tv])
