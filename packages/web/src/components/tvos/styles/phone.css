@@ -594,11 +594,11 @@
     svg {
     font-size: 22px;
   }
-  /* History: who's watching beside the title, swiping sideways, and the counts on the line under them. */
+  /* History: who's watching beside the title (their names on its baseline), swiping sideways, and the counts under them. */
   html[data-tvos-build]:not([data-tv]) .tv-list-page:has(> .tv-stats) {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
-    align-items: center;
+    align-items: baseline;
   }
   html[data-tvos-build]:not([data-tv]) .tv-list-page:has(> .tv-stats) > * {
     grid-column: 1 / -1;
@@ -617,6 +617,7 @@
   html[data-tvos-build]:not([data-tv]) .tv-stats {
     grid-row: 2;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 6px;
     padding: 10px var(--tv-gutter) 0;
   }
