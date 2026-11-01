@@ -884,6 +884,18 @@
     text-align: left;
   }
 
+  /* A phone has no remote with a Back key: the player keeps its Back button, top left, as the Apple TV app on iPhone. */
+  html[data-tvos-build]:not([data-tv])
+    [data-ui='player-button'][data-name='exit'] {
+    display: inline-flex !important;
+  }
+  /* The bar's buttons on one line, under the title, on a phone held upright. */
+  html[data-tvos-build]:not([data-tv])
+    [data-ui='player-bottom-bar']
+    > div:last-child {
+    flex-wrap: nowrap;
+    --control: min(2.6rem, calc((100vw - 4.5rem) / 8));
+  }
   /* The player: the title may take the width, and the screensaver's corners shrink to the phone. */
   html[data-tvos-build]:not([data-tv]) [data-ui='player-title'] {
     max-width: calc(100vw - 2.5rem);
