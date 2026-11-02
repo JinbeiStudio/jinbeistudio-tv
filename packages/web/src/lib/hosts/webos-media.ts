@@ -1,5 +1,4 @@
-import { t } from '@lingui/core/macro';
-import { ofType, subtitleName } from '../playback/controller';
+import { ofType, trackLabel } from '../playback/controller';
 import type { EngineTrack } from '../playback/engine';
 import { SUBTITLE_SIZES, type SubtitleStyle } from '../settings';
 import type { SourceInfo } from '../types';
@@ -121,8 +120,7 @@ export function embeddedSubtitles(source: SourceInfo): EngineTrack[] {
     .map((s, n) => ({
       id: `${EMBEDDED}${n}`,
       type: 'subtitle' as const,
-      label: subtitleName(s, n + 1),
-      detail: t`Embedded`,
+      label: trackLabel(s, n + 1),
       lang: s.Language ?? undefined,
       title: s.Title ?? undefined,
       forced: s.IsForced ?? undefined,
