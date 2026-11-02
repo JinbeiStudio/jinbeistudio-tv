@@ -638,9 +638,17 @@ export function OptionButtons({
     const at = languages.findIndex((l) => sameLanguage(l, track.lang));
     return at < 0 ? languages.length : at;
   };
-  const byPreference = [...player.subtitleTracks].sort(
-    (a, b) => rank(a) - rank(b)
-  );
+  // LG's TV lists the file's own tracks beside the server's, so each row says which it is.
+  const sourced =
+    currentHost().name === 'webos'
+      ? player.subtitleTracks.map((track) => ({
+          ...track,
+          detail: [track.file ? t`Embedded` : t`External`, track.detail]
+            .filter(Boolean)
+            .join(' · '),
+        }))
+      : player.subtitleTracks;
+  const byPreference = [...sourced].sort((a, b) => rank(a) - rank(b));
   const subtitles =
     prefs.ListPreferredSubtitlesOnly === false
       ? { shown: byPreference, hidden: [] }

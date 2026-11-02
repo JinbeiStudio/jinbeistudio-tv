@@ -5193,3 +5193,11 @@ msgstr "Téléchargements et guides d'installation pour chaque appareil."
 #: src/pages/settings/about.tsx
 msgid "The server and the apps this one is a fork of."
 msgstr "Le serveur et les apps dont celle-ci est un fork."
+
+#: src/components/player/options.tsx
+msgid "Embedded"
+msgstr "Intégré"
+
+#: src/components/player/options.tsx
+msgid "External"
+msgstr "Externe"
