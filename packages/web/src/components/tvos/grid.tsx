@@ -43,7 +43,8 @@ export function PosterGrid({
         ))}
       </div>
       {loading && (
-        <div className="tv-gutter">
+        // Alone in the middle until the first posters come; under them while more load.
+        <div className={items.length ? 'tv-gutter tv-more' : 'tv-loading'}>
           <Spinner />
         </div>
       )}

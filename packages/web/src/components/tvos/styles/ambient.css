@@ -1,0 +1,209 @@
+/*
+ * Jinbei's ambient background, behind every tvOS page (Sea in parts.tsx), sign-in and who's watching: a deep navy sea
+ * turning cyan, as Apple's wallpapers, with two slow currents of light drifting over it. The currents are only
+ * moved (transform), never redrawn, so a TV composites them cheaply.
+ */
+
+html[data-tvos-build] {
+  /* The still water: a faint grain keeps the TV from drawing the gradient in bands. */
+  --tv-ambient:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.035 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"),
+    radial-gradient(
+      70vw 60vh at 50% 110%,
+      rgba(12, 110, 140, 0.17),
+      transparent 70%
+    ),
+    linear-gradient(170deg, #010208 0%, #020818 40%, #04132a 72%, #062436 100%);
+  /* Deep current: ultramarine and cyan swells. */
+  --tv-current-a:
+    radial-gradient(
+      40% 24% at 32% 58%,
+      rgba(34, 211, 238, 0.26),
+      transparent 70%
+    ),
+    radial-gradient(
+      44% 28% at 70% 34%,
+      rgba(37, 99, 235, 0.35),
+      transparent 70%
+    ),
+    radial-gradient(
+      32% 20% at 58% 82%,
+      rgba(14, 165, 233, 0.23),
+      transparent 70%
+    );
+  /* Surface swell: lighter, wider, crossing the other way. */
+  --tv-current-b:
+    radial-gradient(
+      48% 17% at 40% 30%,
+      rgba(56, 189, 248, 0.18),
+      transparent 70%
+    ),
+    radial-gradient(
+      42% 21% at 78% 70%,
+      rgba(45, 212, 191, 0.2),
+      transparent 70%
+    ),
+    radial-gradient(
+      36% 19% at 18% 76%,
+      rgba(29, 78, 216, 0.28),
+      transparent 70%
+    );
+}
+/* Sign-in and who's watching, outside the tvOS layout: the still water, and room for the two currents above it but under the page. */
+html[data-tvos-build] [data-page='sign-in'] {
+  background: var(--tv-ambient) !important;
+  isolation: isolate;
+}
+html[data-tvos-build] [data-page='sign-in']::before,
+html[data-tvos-build] [data-page='sign-in']::after {
+  content: '';
+  position: fixed;
+  /* Larger than the window, so the drift never shows an edge. */
+  inset: -35%;
+  z-index: -1;
+  pointer-events: none;
+  will-change: transform;
+}
+html[data-tvos-build] [data-page='sign-in']::before {
+  background: var(--tv-current-a);
+  animation: tv-current-a 18s ease-in-out infinite alternate;
+}
+html[data-tvos-build] [data-page='sign-in']::after {
+  background: var(--tv-current-b);
+  animation: tv-current-b 24s ease-in-out infinite alternate;
+}
+
+/* Every page in the layout: one sea under them all, its water and currents drawn once into canvases a TV only moves. */
+/* The shell's own grey (base.css) would cover it. */
+html[data-tvos-build] [data-tvos][data-ui='shell'] {
+  background: transparent;
+}
+html[data-tvos-build] .tv-sea-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+html[data-tvos-build] .tv-sea-layer :is(.tv-sea, .tv-current canvas) {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+html[data-tvos-build] .tv-sea-layer .tv-current {
+  position: absolute;
+  inset: -35%;
+  will-change: transform;
+}
+html[data-tvos-build] .tv-sea-layer .tv-current-a {
+  animation: tv-current-a 18s ease-in-out infinite alternate;
+}
+html[data-tvos-build] .tv-sea-layer .tv-current-b {
+  animation: tv-current-b 24s ease-in-out infinite alternate;
+}
+@keyframes tv-current-a {
+  0% {
+    transform: translate3d(-14%, 6%, 0) rotate(-7deg) scale(1.1, 0.95);
+  }
+  50% {
+    transform: translate3d(4%, -6%, 0) rotate(2deg) scale(1.25, 0.85);
+  }
+  100% {
+    transform: translate3d(15%, 4%, 0) rotate(8deg) scale(1, 1.15);
+  }
+}
+@keyframes tv-current-b {
+  0% {
+    transform: translate3d(14%, -6%, 0) rotate(5deg) scale(1.2, 0.9);
+  }
+  50% {
+    transform: translate3d(-6%, 5%, 0) rotate(-4deg) scale(1, 1.15);
+  }
+  100% {
+    transform: translate3d(-15%, -3%, 0) rotate(-8deg) scale(1.15, 0.95);
+  }
+}
+/* The currents hold still under a page's artwork (data-art, parts.tsx) and, on TVs, while the remote moves focus (data-moving, layout.tsx). */
+html[data-tvos-build][data-art] .tv-current,
+html[data-tvos-build][data-tv][data-moving] .tv-current,
+html[data-tvos-build][data-tv][data-gliding] .tv-current,
+html[data-tvos-build][data-tv][data-gliding] [data-page='sign-in']::before,
+html[data-tvos-build][data-tv][data-gliding] [data-page='sign-in']::after {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-tvos-build]
+    :is(
+      .tv-current,
+      [data-page='sign-in']::before,
+      [data-page='sign-in']::after
+    ) {
+    animation: none;
+  }
+}
+/* On TVs the glass over the sea shows its tint only: blurring the smooth sea changes nothing, yet the TV redoes it each frame the currents move. */
+html[data-tvos-build][data-tv]:not([data-art])
+  :is(
+    .tv-glass,
+    [data-ui='settings-card-body'],
+    [data-ui='settings-tab-group'],
+    [data-ui='calendar-grid'],
+    [data-ui='item-action'],
+    .tv-app-action .UI-Button__root,
+    .tv-dots
+  ) {
+  backdrop-filter: none !important;
+}
+
+/* Home and title pages below the hero: the artwork and its shade ease out together over the sea. */
+html[data-tvos-build] .tv-backdrop[data-ambient] {
+  overflow: hidden;
+}
+html[data-tvos-build] .tv-backdrop[data-ambient][data-lowered] {
+  opacity: 1;
+  filter: none;
+  transform: none;
+}
+/* On TVs the artwork and its shade are layers before they fade, or the TV draws them as it starts and the fade shows half done. */
+html[data-tvos-build][data-tv] .tv-backdrop[data-ambient] > img,
+html[data-tvos-build][data-tv] .tv-backdrop[data-ambient]::after {
+  will-change: opacity, transform;
+}
+html[data-tvos-build] .tv-backdrop[data-ambient] > *,
+html[data-tvos-build] .tv-backdrop[data-ambient]::after {
+  visibility: visible !important;
+  transition:
+    opacity 1.4s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 1.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+html[data-tvos-build] .tv-backdrop[data-ambient][data-lowered] > *,
+html[data-tvos-build] .tv-backdrop[data-ambient][data-lowered]::after {
+  opacity: 0 !important;
+  transform: scale(1.06);
+}
+/* The spinner shown while the app opens (app.tsx's loading screen, right under #root): over the sea's still water, not the plain grey. */
+html[data-tvos-build] #root > div > div > .UI-LoadingOverlay__overlay {
+  position: fixed;
+  background: var(--tv-ambient);
+  backdrop-filter: none;
+}
+/* On TVs the page's glass behind an open sidebar shows its tint only: each change in the menu made the TV redo every blur under it. */
+html[data-tvos-build][data-tv][data-sidebar]
+  :is(
+    [data-glide-layer='page'] .tv-glass,
+    .tv-top .tv-glass,
+    .tv-edge-capsule,
+    [data-ui='item-action'],
+    .tv-app-action .UI-Button__root,
+    .tv-dots,
+    [data-ui='settings-card-body'],
+    [data-ui='settings-tab-group'],
+    [data-ui='calendar-grid']
+  ) {
+  backdrop-filter: none !important;
+}
+/* A settings tab comes in by its slide only: while it fades, its glass can't see the sea and shows grey, then turns blue once the fade ends. */
+html[data-tvos-build] [data-ui='settings-panel'] {
+  opacity: 1 !important;
+}

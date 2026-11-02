@@ -47,7 +47,7 @@ export function TvosPerson({ personId }: { personId: string }) {
           retry={() => void personQuery.refetch()}
         />
       ) : !person ? (
-        <div className="tv-gutter">
+        <div className="tv-loading">
           <Spinner />
         </div>
       ) : (

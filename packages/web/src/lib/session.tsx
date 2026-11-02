@@ -362,7 +362,12 @@ export function useSessionPhase(base: string) {
 
   const signOut = React.useCallback(async () => {
     await startOver(to.home);
-    endSession(base, phase.kind === 'ready' ? phase.client.token : null);
+    endSession(
+      base,
+      phase.kind === 'ready' || phase.kind === 'picking'
+        ? phase.client.token
+        : null
+    );
     queryClient.removeQueries({ queryKey: ['jf'] });
     setPhase({ kind: 'signed-out' });
   }, [base, phase, queryClient]);

@@ -76,6 +76,7 @@ import {
   useScrolledDown,
   Failed,
   Later,
+  ArtTile,
   Pinned,
   Scroller,
 } from './parts';
@@ -469,8 +470,8 @@ export function TvosItem({
 }
 
 /**
- * The page's artwork, lowered as focus or scrolling goes below the hero: kept
- * apart so that change redraws only the artwork, not every episode.
+ * The page's artwork, lowered to the sea (as on home) as focus or scrolling goes below
+ * the hero: kept apart so that change redraws only the artwork, not every episode.
  */
 function ItemBackdrop({
   lowerRef,
@@ -480,7 +481,7 @@ function ItemBackdrop({
 }) {
   const focused = useFocusInside(lowerRef);
   const scrolled = useScrolledDown();
-  return <Backdrop {...props} lowered={focused || scrolled} />;
+  return <Backdrop {...props} lowered={focused || scrolled} ambient />;
 }
 
 /** Asked for only once scrolled near, as the app's page does. */
@@ -538,7 +539,7 @@ function EpisodeCard({
         // An episode not out yet, or missing, has nothing to play.
         onClick={unavailable ? undefined : onClick}
       >
-        <div className="tv-art">
+        <ArtTile>
           <Artwork
             src={(width) => landscapeUrls(client, episode, { maxWidth: width })}
             alt=""
@@ -568,7 +569,7 @@ function EpisodeCard({
               </div>
             </div>
           )}
-        </div>
+        </ArtTile>
         <small>
           {kicker}
           {episode.CommunityRating

@@ -160,8 +160,8 @@ html[data-tvos-build] [data-ui='player-controls'] {
     inset 0 1px 0 rgba(255, 255, 255, 0.22),
     0 0.4vw 1.2vw rgba(0, 0, 0, 0.25);
 }
-.tv-top .tv-button:hover,
-.tv-top .tv-button:focus {
+.tv-top :is(.tv-button, .tv-menu-button):hover,
+.tv-top :is(.tv-button, .tv-menu-button):focus {
   background: rgba(255, 255, 255, 0.95);
   color: #000;
 }

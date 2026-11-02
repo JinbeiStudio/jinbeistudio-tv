@@ -55,7 +55,8 @@
   margin-bottom: 1.6vw;
   padding: 0.5vw 0.6vw;
   border: 0;
-  border-radius: 1vw;
+  /* A pill, as the sections below, so its highlight matches theirs. */
+  border-radius: 99px;
   background: none;
   color: #fff;
   font-size: 1.1vw;
@@ -74,6 +75,10 @@
   font-size: 0.95vw;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.7);
+}
+/* On the white highlight the clock turns dark too, or it vanishes. */
+.tv-sidebar-who:is(:focus, :hover) .tv-sidebar-time {
+  color: rgba(0, 0, 0, 0.6);
 }
 .tv-sidebar-item {
   display: flex;

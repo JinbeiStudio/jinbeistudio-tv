@@ -15,6 +15,7 @@ const FR: Record<string, string> = {
   // Sidebar and pages
   Home: 'Accueil',
   Menu: 'Menu',
+  More: 'Plus',
   Back: 'Retour',
   'A new version is available': 'Une nouvelle version est disponible',
   Reload: 'Recharger',
@@ -278,6 +279,11 @@ function catalogIds(view: CatalogView): string[] {
   );
   if (!found) return [];
   return [found[1], found[1].replace(/_(?:movie|series|anime)$/, '')];
+}
+
+/** AIOMetadata's "For you" rows, whose synopses start with the model's reason for the pick. */
+export function isForYouCatalog(view: CatalogView): boolean {
+  return catalogIds(view).some((id) => id.startsWith('recommendations.'));
 }
 
 /** Whether the server says this catalog is anime, by its path or its id, whatever it is called. */

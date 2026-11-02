@@ -236,6 +236,12 @@
 .tv-stats .tv-tag {
   margin: 0;
   font-size: 1vw;
+  gap: 0.4em;
+}
+.tv-stats .tv-tag svg {
+  flex: none;
+  font-size: 1.15em;
+  opacity: 0.85;
 }
 /* The app's microphone, beside the search field. */
 .tv-voice {
@@ -268,4 +274,52 @@
   height: 2.9vw !important;
   padding: 0 1.5vw !important;
   font-size: 1.1vw !important;
+}
+/* A page with nothing to show yet: its loader in the middle of the screen, as the title page's. */
+.tv-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+}
+/* More of a list loading: under it, in the middle. */
+.tv-more {
+  display: flex;
+  justify-content: center;
+}
+/* The home's hero loading: in the middle of the screen, not at the foot of its text. */
+.tv-hero > .tv-spinner {
+  margin: auto;
+}
+/* A card waiting for its picture: a glass tile with a slow breath of light across it, which goes once the picture is in (ArtTile). Opacity only, which a TV animates without redrawing. */
+.tv-art[data-loading] {
+  background: rgba(255, 255, 255, 0.1);
+}
+.tv-art[data-loading]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.13) 50%,
+    transparent 70%
+  );
+  animation: tv-breath 1.6s ease-in-out infinite alternate;
+}
+@keyframes tv-breath {
+  from {
+    opacity: 0.15;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tv-art[data-loading]::before {
+    animation: none;
+    opacity: 0.5;
+  }
 }

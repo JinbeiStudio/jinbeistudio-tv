@@ -299,6 +299,7 @@ function Session({
           users={phase.users}
           onPick={phase.choose}
           onChangeServer={changeServer}
+          onSignOut={signOut}
         />
       );
       break;

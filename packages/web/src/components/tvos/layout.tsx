@@ -27,9 +27,10 @@ import { WatchNextSync } from '../watch-next';
 import { GlideLayers } from '../glide-layers';
 import { PinnedTargets } from './parts';
 import { BiChevronLeft, BiChevronRight } from 'react-icons/bi';
-import { MenuOpener, Pinned } from './parts';
+import { MenuOpener, Pinned, Sea } from './parts';
 import { tr } from './i18n';
 import { Sidebar } from './sidebar';
+import { TabBar, isTabRoot, useSwipeBack } from './tabbar';
 import { TvosOutlet } from './routes';
 
 const TvosHome = React.lazy(() =>
@@ -133,6 +134,7 @@ function BackButton({
       data-label={tr('Back')}
       data-tip="below"
       className="tv-glass tv-menu-button tv-back"
+      data-tab-root={isTabRoot(pathname) ? '' : undefined}
       onClick={onBack}
     >
       <BiChevronLeft />
@@ -154,6 +156,82 @@ function EdgeCapsule({ onOpen }: { onOpen: () => void }) {
       <BiChevronRight />
     </button>
   );
+}
+
+/** How long the page counts as gliding after an Up or Down, past its 250 ms glide. */
+const GLIDING_MS = 400;
+/** How long after the last arrow the sea's currents start drifting again. */
+const MOVING_MS = 1500;
+
+// On Up and Down, for TVs: `data-row-move` lifts cards at once (an eased lift re-layers the rows),
+// `data-gliding` drops the glass's blur until the page settles (a TV redoes it every frame).
+function useRowMoveMark() {
+  React.useEffect(() => {
+    if (!currentHost().tv) return;
+    const html = document.documentElement;
+    let settle = 0;
+    let rest = 0;
+    // A key listener, as the app's own move handles the arrow actions and stops there.
+    const onKey = (e: KeyboardEvent) => {
+      // The sea's currents hold still while the remote moves focus, leaving the TV's GPU to the move (ambient.css).
+      if (e.key.startsWith('Arrow')) {
+        html.setAttribute('data-moving', '');
+        window.clearTimeout(rest);
+        rest = window.setTimeout(
+          () => html.removeAttribute('data-moving'),
+          MOVING_MS
+        );
+      }
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+        html.setAttribute('data-row-move', '');
+        // A menu or dialog moves its own list, not the page, and keeps its glass.
+        if (
+          document.activeElement?.closest(
+            '[role=dialog], [role=menu], [role=listbox], .tv-sidebar'
+          )
+        )
+          return;
+        html.setAttribute('data-gliding', '');
+        window.clearTimeout(settle);
+        settle = window.setTimeout(
+          () => html.removeAttribute('data-gliding'),
+          GLIDING_MS
+        );
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight')
+        html.removeAttribute('data-row-move');
+    };
+    window.addEventListener('keydown', onKey, true);
+    return () => {
+      window.removeEventListener('keydown', onKey, true);
+      window.clearTimeout(settle);
+      window.clearTimeout(rest);
+      html.removeAttribute('data-row-move');
+      html.removeAttribute('data-gliding');
+      html.removeAttribute('data-moving');
+    };
+  }, []);
+}
+
+/** On a TV, Up from the player controls' top row hides them, as Back does: nothing lies above to move to. */
+function usePlayerUpHides() {
+  React.useEffect(() => {
+    if (!currentHost().tv) return;
+    const onKey = (e: KeyboardEvent) => {
+      const from = e.target;
+      if (
+        e.key !== 'ArrowUp' ||
+        !(from instanceof HTMLElement) ||
+        !from.closest("[data-ui='player-controls']")
+      )
+        return;
+      // After the app's own move, which leaves the focus where it was when nothing is above.
+      window.setTimeout(() => {
+        if (document.activeElement === from) runAction('back', 'Escape');
+      }, 0);
+    };
+    window.addEventListener('keydown', onKey, true);
+    return () => window.removeEventListener('keydown', onKey, true);
+  }, []);
 }
 
 /**
@@ -183,7 +261,14 @@ export function TvosLayout() {
   const [sidebar, setSidebar] = React.useState(false);
   const closeSidebar = React.useCallback(() => setSidebar(false), []);
   const openSidebar = React.useCallback(() => setSidebar(true), []);
+  const toggleSidebar = React.useCallback(() => setSidebar((o) => !o), []);
   React.useEffect(() => setSidebar(false), [pathname, playing]);
+  // Marks the page while the sidebar is open: the glass behind it goes flat on TVs (ambient.css), redone each frame otherwise.
+  React.useEffect(() => {
+    if (!sidebar) return;
+    document.documentElement.setAttribute('data-sidebar', '');
+    return () => document.documentElement.removeAttribute('data-sidebar');
+  }, [sidebar]);
   const router = useRouter();
   const [under, setUnder] = React.useState<HTMLDivElement | null>(null);
   const [over, setOver] = React.useState<HTMLDivElement | null>(null);
@@ -303,7 +388,7 @@ export function TvosLayout() {
     const away = (e: PointerEvent) => {
       if (
         !(e.target as Element | null)?.closest(
-          '.tv-sidebar, .tv-menu-button, .tv-edge-capsule'
+          '.tv-sidebar, .tv-menu-button, .tv-edge-capsule, .tv-tabbar-more'
         )
       )
         setSidebar(false);
@@ -315,6 +400,12 @@ export function TvosLayout() {
       window.removeEventListener('pointerdown', away, true);
     };
   }, [sidebar]);
+  useRowMoveMark();
+  usePlayerUpHides();
+  const swipeBack = React.useCallback(() => {
+    if (router.history.canGoBack()) router.history.back();
+  }, [router]);
+  useSwipeBack(swipeBack, !onHome && !playing && !sidebar);
   // The other pages' code fetched while idle, so a slow TV doesn't fetch it as one opens or playback starts.
   React.useEffect(() => {
     const warm = () => {
@@ -374,6 +465,13 @@ export function TvosLayout() {
           <PlaylistsHost />
           {currentHost().watchNext && <WatchNextSync />}
           <ItemMenuHost>
+            {!playing && !currentHost().tv && (
+              <TabBar
+                pathname={pathname}
+                moreOpen={sidebar}
+                onMore={toggleSidebar}
+              />
+            )}
             {!playing && (
               <Sidebar
                 open={sidebar}
@@ -386,6 +484,7 @@ export function TvosLayout() {
               {/* As the app's layout: on TVs the page moves in glide layers, fixed things beside them. */}
               <MenuOpener.Provider value={openSidebar}>
                 <PinnedTargets.Provider value={pinned}>
+                  {!playing && <Sea />}
                   <div ref={setUnder} className="contents" />
                   {/* Drawn once the places for fixed things exist, so none starts a frame inside the moving page. */}
                   {under && over && (

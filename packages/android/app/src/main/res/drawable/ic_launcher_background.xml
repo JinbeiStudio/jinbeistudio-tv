@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Apple TV's dark gradient, as the Jinbei Studio icons on every platform. -->
+<!-- A lighter take on the app's sea, as the Jinbei Studio icons on every platform. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <gradient
         android:angle="270"
-        android:endColor="#050508"
-        android:startColor="#4D4F57" />
+        android:centerColor="#08214f"
+        android:endColor="#0b5c77"
+        android:startColor="#061336" />
 </shape>

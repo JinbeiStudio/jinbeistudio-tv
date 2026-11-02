@@ -14,6 +14,24 @@
 html[data-tvos-build][data-tv] :is(.tv-caption, .tv-button) {
   transition: transform 0.25s ease-out;
 }
+/* Moving up or down, the lift is at once: easing it there redraws the rows as the page glides. */
+html[data-tvos-build][data-tv][data-row-move] :is(.tv-art, .tv-caption) {
+  transition: none;
+}
+/* TVs: an episode's text follows its lifted still at once (keyed on an <html> mark, a rule ending on these tags restyled every one in the page). */
+html[data-tvos-build][data-tv] .tv-episode :is(small, strong, p) {
+  transition: none;
+}
+/* While the page glides, its glass (the title page's buttons and links too) shows its tint only: a TV redoes each blur on every frame, past its frame time. */
+html[data-tvos-build][data-tv][data-gliding]
+  :is(
+    .tv-glass,
+    [data-ui='item-action'],
+    .tv-app-action .UI-Button__root,
+    .tv-dots
+  ) {
+  backdrop-filter: none !important;
+}
 html[data-tvos-build][data-tv] .tv-art::after,
 html[data-tvos-build][data-tv] .tv-dots i {
   transition: none;
@@ -109,4 +127,36 @@ html[data-tvos-build][data-tv] :is(.tv-tag, .tv-watched) {
 }
 .tv-failed .tv-button {
   margin-top: 1vw;
+}
+
+/* TVs: while the video plays, the player's buttons and tooltips are a flat tint, as each blur over the moving picture was redone every frame (~60 ms of GPU a frame on an LG C4); paused, they keep their glass. */
+html[data-tvos-build][data-tv]
+  [data-ui='player-controls']:not([data-paused])
+  [data-ui='player-button'] {
+  backdrop-filter: none !important;
+}
+html[data-tvos-build][data-tv]
+  [data-ui='player-controls']:not([data-paused])
+  [data-ui='player-button']:not(:focus-visible) {
+  background: rgba(118, 120, 130, 0.42) !important;
+}
+html[data-tvos-build][data-tv].playing .UI-Tooltip__root {
+  backdrop-filter: none !important;
+}
+/* TVs: focus changes colour and shadow at once; only lifts and fades ease, which the GPU does. An eased background, colour or shadow made the TV restyle, repaint and commit on every frame (calendar presses paused 80–130 ms; the player's buttons cost ~100 ms of main thread a press). */
+html[data-tvos-build][data-tv]
+  :is(
+    .tv-button,
+    .tv-menu-button,
+    .tv-tab,
+    .UI-Button__root,
+    [data-ui='settings-card-item'],
+    [data-ui='calendar-day'],
+    [data-ui='auth-card'] input,
+    .tv-links a,
+    .tv-app-action :is(button, [data-ui='item-action'], [role='button']),
+    [data-ui='player-button'],
+    [data-ui='player-middle-button']
+  ) {
+  transition-property: transform, opacity !important;
 }

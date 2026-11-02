@@ -30,7 +30,13 @@ import {
 import './tvos.css';
 import { tr } from './i18n';
 
-/** Draws its children only once they near the screen, keeping their room until then, as the app's rows do. */
+/** How long after the page opens its later parts draw anyway, once it is idle. */
+const LATER_IDLE_MS = 1500;
+
+/**
+ * Draws its children once they near the screen or the page is idle, keeping their room until then.
+ * Drawn as a transition, which yields to keys: drawn on a TV's first Down it held the page ~110 ms.
+ */
 export function Later({
   room,
   children,
@@ -39,9 +45,22 @@ export function Later({
   children: React.ReactNode;
 }) {
   const [ref, near] = useNear<HTMLDivElement>('400px');
+  const [shown, setShown] = React.useState(false);
+  React.useEffect(() => {
+    if (shown) return;
+    const show = () => React.startTransition(() => setShown(true));
+    if (near) return show();
+    const idle = window.requestIdleCallback
+      ? window.requestIdleCallback(show, { timeout: LATER_IDLE_MS * 2 })
+      : window.setTimeout(show, LATER_IDLE_MS);
+    return () => {
+      if (window.cancelIdleCallback) window.cancelIdleCallback(idle);
+      else window.clearTimeout(idle);
+    };
+  }, [near, shown]);
   return (
-    <div ref={ref} style={near ? undefined : { minHeight: room }}>
-      {near && children}
+    <div ref={ref} style={shown ? undefined : { minHeight: room }}>
+      {shown && children}
     </div>
   );
 }
@@ -50,7 +69,12 @@ export function Later({
 /** What opens the sidebar, for the button beside the pill; the layout provides it. */
 export const MenuOpener = React.createContext<(() => void) | null>(null);
 
-export function TopBar({ hidden }: { hidden?: boolean }) {
+// Memoised, so a page re-rendering as it scrolls doesn't redraw it.
+export const TopBar = React.memo(function TopBar({
+  hidden,
+}: {
+  hidden?: boolean;
+}) {
   const openMenu = React.useContext(MenuOpener);
   const { user } = useSession();
   const avatar = useOwnAvatar();
@@ -100,7 +124,7 @@ export function TopBar({ hidden }: { hidden?: boolean }) {
       </div>
     </Pinned>
   );
-}
+});
 
 /**
  * Where fixed things go: on TVs the page moves in transformed glide layers,
@@ -373,15 +397,127 @@ export function Scroller({
   );
 }
 
+/** A light spot: radii and centre as shares of the box, then its colour (rgba). */
+type Spot = [number, number, number, number, [number, number, number, number]];
+
+// ambient.css's --tv-current-a and -b, as each spot's radial-gradient(rx ry at x y, colour, transparent 70%).
+const CURRENT_A: Spot[] = [
+  [0.4, 0.24, 0.32, 0.58, [34, 211, 238, 0.26]],
+  [0.44, 0.28, 0.7, 0.34, [37, 99, 235, 0.35]],
+  [0.32, 0.2, 0.58, 0.82, [14, 165, 233, 0.23]],
+];
+const CURRENT_B: Spot[] = [
+  [0.48, 0.17, 0.4, 0.3, [56, 189, 248, 0.18]],
+  [0.42, 0.21, 0.78, 0.7, [45, 212, 191, 0.2]],
+  [0.36, 0.19, 0.18, 0.76, [29, 78, 216, 0.28]],
+];
+
+/** One of the sea's currents, drawn once into a small canvas the GPU stretches: as CSS
+ * gradients 1.7 screens wide, a TV took half a second to draw them as the hero lowered. */
+// ambient.css's grain over --tv-ambient, the same image.
+const GRAIN =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.035 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E";
+
+/** The sea's still water (--tv-ambient), drawn once into a canvas: as a CSS background
+ * a TV redrew it whole each time the hero lowered, freezing the move for ~200 ms. */
+function SeaWater() {
+  const ref = React.useRef<HTMLCanvasElement>(null);
+  React.useEffect(() => {
+    const ctx = ref.current?.getContext('2d', { alpha: false });
+    if (!ctx) return;
+    const { width: w, height: h } = ctx.canvas;
+    // linear-gradient(170deg, …): CSS's gradient line through the centre, as long as the box needs.
+    const angle = (170 * Math.PI) / 180;
+    const [dx, dy] = [Math.sin(angle), -Math.cos(angle)];
+    const half = (Math.abs(w * dx) + Math.abs(h * dy)) / 2;
+    const deep = ctx.createLinearGradient(
+      w / 2 - dx * half,
+      h / 2 - dy * half,
+      w / 2 + dx * half,
+      h / 2 + dy * half
+    );
+    deep.addColorStop(0, '#010208');
+    deep.addColorStop(0.4, '#020818');
+    deep.addColorStop(0.72, '#04132a');
+    deep.addColorStop(1, '#062436');
+    ctx.fillStyle = deep;
+    ctx.fillRect(0, 0, w, h);
+    // radial-gradient(70vw 60vh at 50% 110%, rgba(12, 110, 140, 0.17), transparent 70%).
+    ctx.setTransform(0.7 * w, 0, 0, 0.6 * h, 0.5 * w, 1.1 * h);
+    const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
+    glow.addColorStop(0, 'rgba(12, 110, 140, 0.17)');
+    glow.addColorStop(0.7, 'rgba(12, 110, 140, 0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(-0.5 / 0.7, -1.1 / 0.6, 1 / 0.7, 1 / 0.6);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    const grain = new Image();
+    grain.onload = () => {
+      const pattern = ctx.createPattern(grain, 'repeat');
+      if (!pattern) return;
+      ctx.fillStyle = pattern;
+      ctx.fillRect(0, 0, w, h);
+    };
+    grain.src = GRAIN;
+    return () => {
+      grain.onload = null;
+    };
+  }, []);
+  return <canvas ref={ref} className="tv-sea" width={1920} height={1080} />;
+}
+
+function SeaCurrent({
+  spots,
+  className,
+}: {
+  spots: Spot[];
+  className: string;
+}) {
+  const ref = React.useRef<HTMLCanvasElement>(null);
+  React.useEffect(() => {
+    const ctx = ref.current?.getContext('2d');
+    if (!ctx) return;
+    const { width, height } = ctx.canvas;
+    // CSS paints the first gradient on top.
+    for (const [rx, ry, x, y, [r, g, b, a]] of [...spots].reverse()) {
+      ctx.setTransform(rx * width, 0, 0, ry * height, x * width, y * height);
+      const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
+      // Fading to the same colour, as CSS's transparent does, rather than to black.
+      glow.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${a})`);
+      glow.addColorStop(0.7, `rgba(${r}, ${g}, ${b}, 0)`);
+      ctx.fillStyle = glow;
+      ctx.fillRect(-x / rx, -y / ry, 1 / rx, 1 / ry);
+    }
+  }, [spots]);
+  return (
+    <div className={`tv-current ${className}`}>
+      <canvas ref={ref} width={408} height={230} />
+    </div>
+  );
+}
+
+/** Jinbei's sea, under every page of the layout: drawn once, only its currents move. */
+export function Sea() {
+  return (
+    <div className="tv-sea-layer" aria-hidden>
+      <SeaWater />
+      <SeaCurrent spots={CURRENT_A} className="tv-current-a" />
+      <SeaCurrent spots={CURRENT_B} className="tv-current-b" />
+    </div>
+  );
+}
+
 /** The artwork behind a page; `lowered` fades it out to the plain background. */
 export function Backdrop({
   item,
   lowered,
   waiting,
   onReady,
+  ambient,
 }: {
   item: BaseItemDto | undefined;
   lowered: boolean;
+  /** Lowered, shows Jinbei's ambient background instead of the blurred artwork. */
+  ambient?: boolean;
   /** Kept hidden while the page loads. */
   waiting?: boolean;
   /** Told once the artwork has loaded, failed, or there is none. */
@@ -393,6 +529,13 @@ export function Backdrop({
   React.useEffect(() => {
     if (none) onReady?.();
   }, [none, onReady]);
+  // Marks the page while artwork covers the sea (ambient.css): the currents rest, the glass keeps its blur.
+  const art = !!ambient && !lowered && !waiting && !!url;
+  React.useEffect(() => {
+    if (!art) return;
+    document.documentElement.setAttribute('data-art', '');
+    return () => document.documentElement.removeAttribute('data-art');
+  }, [art]);
   // The app's saved-image cache, so artwork seen before shows at once.
   return (
     <Pinned under>
@@ -400,9 +543,10 @@ export function Backdrop({
         className="tv-backdrop"
         data-lowered={lowered ? '' : undefined}
         data-waiting={waiting ? '' : undefined}
+        data-ambient={ambient ? '' : undefined}
       >
         <Layers url={url ?? undefined} onReady={onReady} />
-        {item && currentHost().tv && (
+        {item && currentHost().tv && !ambient && (
           <BlurredCopy
             src={backdropUrl(client, item, { maxWidth: 480 })}
             active={lowered}
@@ -680,6 +824,30 @@ export function Row({
   );
 }
 
+/** How long a card breathes at most while its picture loads: one with none to load stops. */
+const ART_WAIT_MS = 8000;
+
+/** A card's artwork tile: a slow breath of light (styles: .tv-art[data-loading]) until its picture has loaded. */
+export function ArtTile({ children }: { children?: React.ReactNode }) {
+  const [loading, setLoading] = React.useState(true);
+  React.useEffect(() => {
+    if (!loading) return;
+    const stop = window.setTimeout(() => setLoading(false), ART_WAIT_MS);
+    return () => window.clearTimeout(stop);
+  }, [loading]);
+  const done = () => setLoading(false);
+  return (
+    <div
+      className="tv-art"
+      data-loading={loading ? '' : undefined}
+      onLoadCapture={done}
+      onErrorCapture={done}
+    >
+      {children}
+    </div>
+  );
+}
+
 /** Told which title a card's focus rests on, for a page whose artwork follows it (the hero setting's "follows"). */
 export const FollowCard = React.createContext<
   ((item: BaseItemDto) => void) | null
@@ -704,7 +872,7 @@ export const PosterCard = React.memo(function PosterCard({
         data-focus="own"
         onClick={onClick ?? (() => navigate(itemPath(item)))}
       >
-        <div className="tv-art">
+        <ArtTile>
           {/* The app's own artwork: sized to the card, decoded off the main thread, loaded near the screen. */}
           <Artwork
             src={(width) => posterUrl(client, item, { maxWidth: width })}
@@ -715,7 +883,7 @@ export const PosterCard = React.memo(function PosterCard({
               ✓
             </span>
           )}
-        </div>
+        </ArtTile>
         <span className="tv-caption">{itemTitle(item)}</span>
       </button>
     </ItemMenu>
@@ -750,7 +918,7 @@ export function WideCard({
       data-focus="own"
       onClick={onClick}
     >
-      <div className="tv-art">
+      <ArtTile>
         <Artwork
           src={(width) => landscapeUrls(client, item, { maxWidth: width })}
           alt=""
@@ -765,7 +933,7 @@ export function WideCard({
             </div>
           )}
         </div>
-      </div>
+      </ArtTile>
     </button>
   );
   return menu ? (

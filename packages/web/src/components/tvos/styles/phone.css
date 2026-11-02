@@ -1,0 +1,944 @@
+/*
+ * Phones (and short touch screens held sideways): the Apple TV app on iPhone. The rest of the style sizes
+ * by the screen's width for a 1920 canvas, far too small here, so this sets touch sizes in px instead.
+ * TVs lay out at 1280 wide and never match; html[data-tv] is left out all the same.
+ */
+
+/* Shown by the phone rules only. */
+.tv-tabbar {
+  display: none;
+}
+
+@media (max-width: 700px), (max-height: 500px) and (pointer: coarse) {
+  html[data-tvos-build]:not([data-tv]) {
+    --tv-phone-safe-top: env(safe-area-inset-top, 0px);
+    --tv-phone-safe-bottom: env(safe-area-inset-bottom, 0px);
+    --tv-phone-bar: calc(64px + max(var(--tv-phone-safe-bottom), 10px));
+    /* Two and a half posters across a row, as the Apple TV app shows on iPhone. */
+    --tv-phone-poster: min(calc((100vw - 36px) / 2.5), 170px);
+    -webkit-tap-highlight-color: transparent;
+  }
+  html[data-tvos-build]:not([data-tv]) [data-tvos] {
+    --tv-gutter: max(16px, env(safe-area-inset-left, 0px));
+  }
+
+  /* The tab bar: iOS 26's floating glass capsule at the foot. */
+  html[data-tvos-build]:not([data-tv]) .tv-tabbar {
+    position: fixed;
+    left: 10px;
+    right: 10px;
+    bottom: max(var(--tv-phone-safe-bottom), 10px);
+    z-index: 42;
+    display: flex;
+    height: 62px;
+    padding: 4px;
+    border-radius: 999px;
+    background: rgba(40, 42, 50, 0.55);
+    backdrop-filter: blur(24px) saturate(1.8) brightness(1.1);
+    box-shadow:
+      inset 0 0 0 0.5px rgba(255, 255, 255, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25),
+      0 8px 24px rgba(0, 0, 0, 0.4);
+  }
+  .tv-tabbar-item {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    color: rgba(255, 255, 255, 0.62);
+    outline: none;
+    transition:
+      background 0.2s ease,
+      color 0.2s ease;
+  }
+  .tv-tabbar-item svg {
+    font-size: 24px;
+  }
+  .tv-tabbar-item span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .tv-tabbar-item[data-current] {
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+  }
+  .tv-tabbar-item:active {
+    background: rgba(255, 255, 255, 0.22);
+  }
+
+  /* Room under every page for the tab bar. */
+  html[data-tvos-build]:not([data-tv]) [data-tvos] [data-page] {
+    padding-bottom: calc(var(--tv-phone-bar) + 16px);
+  }
+
+  /* The tab bar stands for the top bar, the edge capsule and the sidebar's sections it shows. */
+  html[data-tvos-build]:not([data-tv])
+    :is(.tv-top, .tv-edge-capsule, .tv-back[data-tab-root]) {
+    display: none;
+  }
+  html[data-tvos-build]:not([data-tv])
+    .tv-sidebar-item:is(
+      [data-section='Home'],
+      [data-section='Search'],
+      [data-section='Discover'],
+      [data-section='History'],
+      [data-section='Calendar']
+    ) {
+    display: none;
+  }
+
+  /* More: the sidebar as an iOS sheet rising above the tab bar. */
+  html[data-tvos-build]:not([data-tv]) .tv-sidebar-shade {
+    background: rgba(0, 0, 0, 0.45);
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-sidebar {
+    top: auto;
+    left: 10px;
+    right: 10px;
+    bottom: calc(var(--tv-phone-bar) + 8px);
+    width: auto;
+    max-height: calc(
+      100svh - var(--tv-phone-bar) - var(--tv-phone-safe-top) - 24px
+    );
+    overflow-y: auto;
+    gap: 2px;
+    padding: 10px;
+    border-radius: 28px;
+    transform: translateY(calc(100% + 120px));
+    box-shadow:
+      inset 0 0 0 0.5px rgba(255, 255, 255, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3),
+      0 12px 40px rgba(0, 0, 0, 0.5);
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-sidebar[data-open] {
+    transform: none;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-sidebar-who {
+    gap: 12px;
+    margin-bottom: 6px;
+    padding: 8px 10px;
+    font-size: 17px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-sidebar-who .tv-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 17px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-sidebar-time {
+    font-size: 15px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-sidebar-item {
+    flex: none;
+    gap: 14px;
+    height: 50px;
+    padding: 0 16px;
+    font-size: 17px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-sidebar-item svg {
+    font-size: 22px;
+  }
+
+  /* Back: iOS's round glass button at the top left, under the status bar. */
+  html[data-tvos-build]:not([data-tv]) .tv-glass.tv-menu-button.tv-back {
+    /* Fixed here, so it needn't wait to line up with the page's title. */
+    top: calc(var(--tv-phone-safe-top) + 10px) !important;
+    visibility: visible !important;
+    left: max(12px, env(safe-area-inset-left, 0px));
+    width: 40px;
+    height: 40px;
+    font-size: 26px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-menu-button {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  /* Touch has no focus to follow and leaves :hover stuck after a tap: nothing lifts, scales or labels itself. */
+  html[data-tvos-build]:not([data-tv])
+    [data-tvos]
+    :is(
+      .tv-card,
+      .tv-button,
+      .tv-tab,
+      .tv-menu-button,
+      .tv-sidebar-item,
+      .tv-sidebar-who
+    ),
+  html[data-tvos-build]:not([data-tv])
+    [data-tvos]
+    :is(.tv-card, .tv-tab):is(:hover, :focus)
+    :is(.tv-art, .tv-caption, small, strong, p) {
+    transform: none !important;
+  }
+  html[data-tvos-build]:not([data-tv])
+    [data-tvos]
+    .tv-card:is(:hover, :focus)
+    .tv-art {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  }
+  html[data-tvos-build]:not([data-tv])
+    [data-tvos]
+    .tv-card:is(:hover, :focus)
+    .tv-art::after {
+    opacity: 0;
+  }
+  html[data-tvos-build]:not([data-tv])
+    :is(.tv-button.round, .tv-menu-button)[data-label]::after {
+    content: none !important;
+  }
+  html[data-tvos-build]:not([data-tv])
+    [data-tvos]
+    :is(.tv-button, .tv-tab, .tv-sidebar-item):hover:not(:active) {
+    background: var(--tv-glass);
+    color: #fff;
+  }
+  html[data-tvos-build]:not([data-tv]) [data-tvos] .tv-tab[data-on]:hover {
+    background: rgba(255, 255, 255, 0.95);
+    color: #000;
+  }
+  html[data-tvos-build]:not([data-tv])
+    [data-tvos]
+    :is(.tv-button, .tv-tab):active {
+    background: rgba(255, 255, 255, 0.95);
+    color: #000;
+  }
+
+  /* The artwork: the top of the screen, fading into the sea below. */
+  html[data-tvos-build]:not([data-tv]) .tv-backdrop {
+    bottom: auto;
+    height: 74svh;
+    -webkit-mask-image: linear-gradient(180deg, #000 55%, transparent);
+    mask-image: linear-gradient(180deg, #000 55%, transparent);
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-backdrop::after {
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.35) 0%,
+      transparent 18%,
+      transparent 45%,
+      rgba(0, 0, 0, 0.7) 100%
+    );
+  }
+
+  /* The hero. */
+  html[data-tvos-build]:not([data-tv]) .tv-hero {
+    min-height: 74svh;
+    gap: 8px;
+    padding: calc(var(--tv-phone-safe-top) + 64px) var(--tv-gutter) 20px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-home .tv-hero {
+    min-height: 70svh;
+    padding-bottom: 12px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-logo {
+    max-width: 72vw;
+    max-height: 104px;
+    object-position: center bottom;
+    align-self: center;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-title {
+    max-width: none;
+    font-size: 32px;
+    line-height: 1.05;
+    text-align: center;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-meta {
+    font-size: 13px;
+    text-align: center;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-tagline {
+    font-size: 15px;
+    text-align: center;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-overview {
+    max-width: none;
+    font-size: 15px;
+    line-height: 1.4;
+    text-align: center;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-buttons {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-button {
+    gap: 8px;
+    height: 44px;
+    padding: 0 20px;
+    font-size: 16px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-button.round {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    font-size: 20px;
+  }
+  /* Play: iOS's one white button, as the focused one on a TV. */
+  html[data-tvos-build]:not([data-tv])
+    [data-tvos]
+    .tv-hero
+    .tv-buttons
+    > .tv-button:not(.round):first-child {
+    min-width: 132px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #000;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-dots {
+    gap: 6px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-dots i {
+    width: 6px;
+    height: 6px;
+  }
+
+  /* Rows swipe sideways and settle on a card, as iOS's do. */
+  html[data-tvos-build]:not([data-tv]) .tv-row {
+    padding-top: 20px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-row h2 {
+    margin: 0 var(--tv-gutter) 2px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-scroller {
+    gap: 10px;
+    padding: 8px var(--tv-gutter) 6px;
+    scroll-padding: 0 var(--tv-gutter);
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-scroller .tv-card {
+    scroll-snap-align: start;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-card {
+    gap: 6px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-art {
+    border-radius: 10px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-poster .tv-art {
+    width: var(--tv-phone-poster);
+    height: calc(var(--tv-phone-poster) * 1.5);
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-wide .tv-art {
+    width: min(72vw, 300px);
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-caption {
+    width: var(--tv-phone-poster);
+    font-size: 13px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-overlay {
+    padding: 28px 10px 10px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-overlay strong {
+    font-size: 15px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-overlay span {
+    font-size: 12px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-progress {
+    height: 3px;
+    margin-top: 6px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-see-all span {
+    font-size: 15px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-episode {
+    width: min(72vw, 300px);
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-episode small {
+    font-size: 11px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-episode strong {
+    font-size: 15px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-episode p {
+    font-size: 13px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-number {
+    font-size: 36px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-person {
+    width: 88px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-person .tv-art {
+    width: 80px;
+    height: 80px;
+    font-size: 26px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-person strong {
+    font-size: 13px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-person span {
+    font-size: 12px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-badges {
+    left: 6px;
+    top: 6px;
+    gap: 4px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-watched {
+    right: 6px;
+    top: 6px;
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-tag {
+    margin-left: 6px;
+    padding: 2px 7px;
+    font-size: 11px;
+    vertical-align: 2px;
+  }
+
+  /* Tabs (seasons, kinds, filters): a sideways strip of pills. */
+  html[data-tvos-build]:not([data-tv]) .tv-tabs {
+    gap: 8px;
+    padding: 12px var(--tv-gutter) 4px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-tab {
+    height: 34px;
+    padding: 0 14px;
+    font-size: 15px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-tab .tv-tag {
+    font-size: 10px;
+  }
+
+  /* Pages: iOS's large title at the top; under the Back button where there is one. */
+  html[data-tvos-build]:not([data-tv]) :is(.tv-list-page, .tv-search) {
+    padding-top: calc(var(--tv-phone-safe-top) + 16px);
+  }
+  html[data-tvos-build]:not([data-tv]):has(.tv-back:not([data-tab-root]))
+    :is(.tv-list-page, .tv-search) {
+    padding-top: calc(var(--tv-phone-safe-top) + 62px);
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-page-title,
+  html[data-tvos-build]:not([data-tv]) .tv-calendar [data-ui='page-title'] {
+    font-size: 32px;
+    line-height: 1.15;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-note {
+    font-size: 15px;
+    padding-top: 16px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-wrap {
+    gap: 18px 10px;
+    padding: 14px var(--tv-gutter);
+  }
+
+  /* Grids: three posters across, filling the width. */
+  html[data-tvos-build]:not([data-tv]) .tv-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px 10px;
+    padding-top: 16px;
+  }
+  html[data-tvos-build]:not([data-tv]) :is(.tv-grid, .tv-wrap) .tv-poster {
+    min-width: 0;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-grid .tv-poster .tv-art {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 2 / 3;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-grid > *,
+  html[data-tvos-build]:not([data-tv]) .tv-grid .tv-poster {
+    width: 100%;
+    min-width: 0;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-gutter-grid {
+    padding: 16px var(--tv-gutter) 0;
+  }
+  /* Discover's catalogs on one line that swipes, not a wall of pills. */
+  html[data-tvos-build]:not([data-tv]) .tv-tabs-wrap {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-count {
+    margin-left: 8px;
+    font-size: 13px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-tabs-gap {
+    width: 8px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-card-hold[data-shape='poster'] {
+    width: var(--tv-phone-poster);
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-card-hold[data-shape='wide'] {
+    width: min(72vw, 300px);
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-grid .tv-caption {
+    width: 100%;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-wrap .tv-poster {
+    width: calc((100% - 20px) / 3);
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-wrap .tv-poster .tv-art {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 2 / 3;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-wrap .tv-caption {
+    width: 100%;
+  }
+
+  /* Search: a 17 px field, so iOS doesn't zoom in on it. */
+  html[data-tvos-build]:not([data-tv]) .tv-search {
+    padding-left: var(--tv-gutter);
+    padding-right: var(--tv-gutter);
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-field {
+    gap: 10px;
+    height: 44px;
+    padding: 0 14px;
+    border-radius: 12px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-field input {
+    font-size: 17px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-field svg {
+    width: 18px;
+    height: 18px;
+    flex: none;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-voice {
+    top: calc(var(--tv-phone-safe-top) + 18px);
+    right: calc(var(--tv-gutter) + 2px);
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-voice button {
+    width: 40px !important;
+    height: 40px !important;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-recent {
+    padding-top: 20px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-recent h2 {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+  /* The page has its margin already; rows still swipe out to the screen's edges. */
+  html[data-tvos-build]:not([data-tv]) .tv-tabs-flush {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-search .tv-row h2 {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-search .tv-scroller {
+    margin: 0 calc(-1 * var(--tv-gutter));
+  }
+
+  /* The title page. */
+  html[data-tvos-build]:not([data-tv])
+    .tv-hero
+    .tv-app-action
+    :is(button, a, [data-ui='item-action'], [role='button']),
+  html[data-tvos-build]:not([data-tv])
+    .tv-app-action:not(.tv-links)
+    :is(button, [data-ui='item-action'], [role='button']) {
+    min-width: 44px;
+    height: 44px !important;
+    font-size: 16px !important;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-app-action:not(.tv-links) button {
+    padding: 0 18px !important;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-about-body {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 8px var(--tv-gutter) 0;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-about-body p {
+    font-size: 15px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-about-body dl {
+    gap: 6px 14px;
+    font-size: 14px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-links {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 16px var(--tv-gutter) 0;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-links a {
+    height: 36px;
+    padding: 0 14px;
+    margin: 0;
+    font-size: 14px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-links a[data-ui='external-link'] {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+  }
+  html[data-tvos-build]:not([data-tv])
+    .tv-links
+    a[data-ui='external-link']
+    svg {
+    font-size: 22px;
+  }
+  /* History: who's watching beside the title (their names on its baseline), swiping sideways, and the counts under them. */
+  html[data-tvos-build]:not([data-tv]) .tv-list-page:has(> .tv-stats) {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: baseline;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-list-page:has(> .tv-stats) > * {
+    grid-column: 1 / -1;
+  }
+  html[data-tvos-build]:not([data-tv])
+    .tv-list-page:has(> .tv-stats)
+    > .tv-page-title {
+    grid-area: 1 / 1;
+  }
+  html[data-tvos-build]:not([data-tv])
+    .tv-list-page:has(> .tv-stats)
+    > .tv-tabs {
+    grid-area: 1 / 2;
+    padding: 0 var(--tv-gutter) 0 12px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-stats {
+    grid-row: 2;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px var(--tv-gutter) 0;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-stats .tv-tag {
+    font-size: 12px;
+  }
+  /* The count level with the kind tag beside it, which sits a little low on the letters. */
+  html[data-tvos-build]:not([data-tv]) .tv-page-title .tv-count {
+    position: relative;
+    top: 2px;
+  }
+  /* A long title and its tag wrap rather than run off the screen. */
+  html[data-tvos-build]:not([data-tv]) .tv-page-title {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  /* History's Export and Reset are left off phones, by choice. */
+  html[data-tvos-build]:not([data-tv]) .tv-title-actions {
+    display: none;
+  }
+
+  /* Calendar. */
+  /* The app's own page inside: its body alone is padded, at the top as a tab's page (no Back). */
+  html[data-tvos-build]:not([data-tv]) .tv-calendar {
+    padding: 0;
+  }
+  /* No Today marker in the phone list, by choice: the days are labelled. */
+  html[data-tvos-build]:not([data-tv]) [data-ui='calendar-today-line'] {
+    display: none;
+  }
+  html[data-tvos-build]:not([data-tv])
+    [data-tvos]
+    .tv-calendar
+    [data-ui='page-body'] {
+    padding: calc(var(--tv-phone-safe-top) + 16px) var(--tv-gutter) 24px !important;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-calendar [data-ui='calendar-grid'] {
+    padding: 6px;
+    border-radius: 18px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-calendar [data-ui='calendar-day'] {
+    height: 64px;
+    border-radius: 10px;
+  }
+
+  /* The app's own pages (settings, downloads…): under the status bar and the Back button. */
+  html[data-tvos-build]:not([data-tv])
+    [data-tvos]
+    :is([data-ui='page-body'], [data-ui='page-message']) {
+    padding: calc(var(--tv-phone-safe-top) + 62px) var(--tv-gutter) 24px !important;
+  }
+  html[data-tvos-build]:not([data-tv]) [data-ui='downloads-section'] h2 {
+    font-size: 20px;
+  }
+
+  /* Settings: its sections as a sideways strip of pills, as the pages' tabs. */
+  html[data-tvos-build]:not([data-tv]) [data-ui='settings-tabs'] {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
+    gap: 8px;
+    margin: 0 calc(-1 * var(--tv-gutter));
+    min-width: calc(100% + 2 * var(--tv-gutter));
+    max-width: none !important;
+    padding: 0 var(--tv-gutter) 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  html[data-tvos-build]:not([data-tv])
+    [data-ui='settings-tabs']
+    > div:has([data-ui='settings-donate']) {
+    flex: none;
+    flex-basis: auto;
+    order: 9;
+    padding: 0;
+  }
+  html[data-tvos-build]:not([data-tv]) [data-ui='settings-tab-group'] {
+    display: contents !important;
+  }
+  html[data-tvos-build]:not([data-tv]) [data-ui='settings-tab'] {
+    flex: none;
+    gap: 6px;
+    height: 34px !important;
+    padding: 0 14px !important;
+    border-radius: 999px !important;
+    font-size: 15px !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+  }
+  html[data-tvos-build]:not([data-tv])
+    [data-ui='settings-tab'][data-state='active'] {
+    background: rgba(255, 255, 255, 0.22) !important;
+  }
+  html[data-tvos-build]:not([data-tv]) [data-ui='settings-tab'] svg {
+    font-size: 17px;
+  }
+  html[data-tvos-build]:not([data-tv]) [data-ui='settings-card-title'] {
+    margin: 0 0 6px 16px;
+    font-size: 12px;
+  }
+  html[data-tvos-build]:not([data-tv]) [data-ui='settings-card-description'] {
+    margin-left: 16px;
+    font-size: 13px !important;
+  }
+  html[data-tvos-build]:not([data-tv]) [data-ui='settings-card-body'] {
+    border-radius: 14px !important;
+  }
+  /* At rest and under the pointer alike, or a hovered row resizes and flickers in and out of hover. */
+  html[data-tvos-build]:not([data-tv]) [data-ui='settings-card-item'],
+  html[data-tvos-build]:not([data-tv]) [data-ui='settings-card-item']:hover {
+    padding: 12px 16px !important;
+  }
+  html[data-tvos-build]:not([data-tv])
+    [data-ui='settings-card-item']
+    :is(p.font-semibold, .UI-Switch__label, .UI-BasicField__fieldLabel) {
+    font-size: 17px;
+  }
+  html[data-tvos-build]:not([data-tv]) [data-ui='settings-card-item'] .text-sm {
+    font-size: 14px;
+  }
+  html[data-tvos-build]:not([data-tv])
+    [data-ui='settings-header']
+    > div:first-child {
+    border-radius: 10px !important;
+  }
+
+  /* Who's watching. */
+  html[data-tvos-build]:not([data-tv]) [data-ui='user-picker'] {
+    gap: 20px !important;
+  }
+  html[data-tvos-build]:not([data-tv]) [data-ui='user-picker-user'] {
+    width: 96px !important;
+  }
+  html[data-tvos-build]:not([data-tv])
+    [data-ui='user-picker-user']
+    [data-focus-frame]
+    > * {
+    width: 88px !important;
+    height: 88px !important;
+    font-size: 32px !important;
+  }
+  html[data-tvos-build]:not([data-tv])
+    [data-ui='user-picker-user']
+    span:last-child {
+    font-size: 15px;
+  }
+
+  /* The versions list: an iOS sheet from the foot rather than a panel at the right. */
+  html[data-tvos-build]:not([data-tv]) .UI-Modal__content[data-name='versions'],
+  html[data-tvos-build]:not([data-tv])
+    [data-name='versions']
+    .UI-Modal__content {
+    inset: auto 8px max(var(--tv-phone-safe-bottom), 8px) 8px !important;
+    width: auto !important;
+    max-height: calc(100svh - var(--tv-phone-safe-top) - 24px) !important;
+    border-radius: 28px !important;
+  }
+  html[data-tvos-build]:not([data-tv])
+    .UI-Modal__content[data-name='versions']
+    .UI-Modal__title {
+    font-size: 22px;
+  }
+  html[data-tvos-build]:not([data-tv])
+    .UI-Modal__content[data-name='versions']
+    .UI-Modal__description,
+  html[data-tvos-build]:not([data-tv]) [data-ui='versions-count'] {
+    font-size: 13px;
+  }
+  html[data-tvos-build]:not([data-tv])
+    :is([data-ui='version'], [data-ui='version-notice']) {
+    border-radius: 14px;
+  }
+  html[data-tvos-build]:not([data-tv]) [data-ui='version-play'] {
+    gap: 10px;
+    padding: 12px;
+  }
+  html[data-tvos-build]:not([data-tv]) [data-ui='version-name'] {
+    font-size: 15px;
+  }
+  html[data-tvos-build]:not([data-tv]) [data-ui='version-description'] {
+    font-size: 12px;
+  }
+  html[data-tvos-build]:not([data-tv]) [data-ui='version-play-icon'] svg {
+    font-size: 20px;
+  }
+
+  /* Menus, pop-ups, sheets and dialogs at touch size. */
+  html[data-tvos-build]:not([data-tv])
+    :is(.UI-ContextMenu__root, .UI-Popover__root) {
+    min-width: min(260px, calc(100vw - 32px));
+    padding: 6px !important;
+    border-radius: 20px !important;
+  }
+  html[data-tvos-build]:not([data-tv])
+    :is(.UI-ContextMenu__label, .UI-DropdownMenu__label) {
+    padding: 6px 12px 8px;
+    font-size: 13px;
+  }
+  html[data-tvos-build]:not([data-tv])
+    :is(
+      .UI-ContextMenu__item,
+      .UI-DropdownMenu__item,
+      .UI-DropdownMenu__subTrigger
+    ) {
+    gap: 10px;
+    min-height: 44px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-size: 16px;
+  }
+  html[data-tvos-build]:not([data-tv])
+    :is(.UI-ContextMenu__item, .UI-DropdownMenu__item)
+    > svg {
+    font-size: 19px;
+    margin-inline-end: 10px;
+  }
+  html[data-tvos-build]:not([data-tv]) .UI-ContextMenu__separator {
+    margin: 4px;
+  }
+  /* Every side sheet rises from the foot, as an iOS sheet: the screen is too narrow for one at the side. */
+  html[data-tvos-build]:not([data-tv])
+    .UI-Drawer__content:is(.start-0, .end-0, .bottom-0) {
+    inset: auto 8px max(var(--tv-phone-safe-bottom), 8px) 8px !important;
+    width: auto !important;
+    max-width: none !important;
+    height: auto !important;
+    max-height: calc(100svh - var(--tv-phone-safe-top) - 16px) !important;
+    border-radius: 28px !important;
+  }
+  html[data-tvos-build]:not([data-tv])
+    :is(.UI-Drawer__title, .UI-Modal__title) {
+    font-size: 20px;
+  }
+  html[data-tvos-build]:not([data-tv]) .UI-Modal__content {
+    border-radius: 24px !important;
+  }
+  html[data-tvos-build]:not([data-tv]) .UI-Modal__close {
+    width: 36px;
+    height: 36px;
+  }
+  html[data-tvos-build]:not([data-tv]) [data-sonner-toast] {
+    border-radius: 18px !important;
+  }
+  html[data-tvos-build]:not([data-tv])
+    :is([data-ui='next-episode-card'], [data-ui='still-watching'] > div) {
+    border-radius: 20px !important;
+  }
+  html[data-tvos-build]:not([data-tv]) [data-ui='next-episode-image'] {
+    border-radius: 20px 20px 0 0;
+  }
+  html[data-tvos-build]:not([data-tv]) [data-ui='still-watching'] > div {
+    padding: 20px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-failed {
+    gap: 10px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-failed strong {
+    font-size: 22px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-failed span {
+    font-size: 15px;
+  }
+
+  /* A person: the photo above the name and bio, centred. */
+  html[data-tvos-build]:not([data-tv]) .tv-person-head {
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 0 var(--tv-gutter) 8px;
+    text-align: center;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-person-photo {
+    width: 140px;
+    height: 140px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-person-text {
+    gap: 8px;
+    max-width: none;
+    padding-top: 0;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-person-bio {
+    font-size: 15px;
+    text-align: left;
+  }
+
+  /* A phone has no remote with a Back key: the player keeps its Back button, top left, as the Apple TV app on iPhone. */
+  html[data-tvos-build]:not([data-tv])
+    [data-ui='player-button'][data-name='exit'] {
+    display: inline-flex !important;
+  }
+  /* The bar's buttons on one line, under the title, on a phone held upright. */
+  html[data-tvos-build]:not([data-tv])
+    [data-ui='player-bottom-bar']
+    > div:last-child {
+    flex-wrap: nowrap;
+    --control: min(2.6rem, calc((100vw - 4.5rem) / 8));
+  }
+  /* The player: the title may take the width, and the screensaver's corners shrink to the phone. */
+  html[data-tvos-build]:not([data-tv]) [data-ui='player-title'] {
+    max-width: calc(100vw - 2.5rem);
+  }
+  html[data-tvos-build]:not([data-tv])
+    .UI-Modal__content[data-name='player-info'] {
+    inset: auto 8px max(var(--tv-phone-safe-bottom), 8px) 8px !important;
+    border-radius: 24px !important;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-player-info {
+    gap: 16px;
+  }
+  html[data-tvos-build]:not([data-tv]) :is(.tv-saver-logo, .tv-saver-time) {
+    bottom: calc(var(--tv-phone-safe-bottom) + 24px);
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-saver-logo {
+    left: 20px;
+    max-width: 50vw;
+    max-height: 72px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-saver-time {
+    right: 20px;
+    font-size: 28px;
+  }
+  html[data-tvos-build]:not([data-tv]) .tv-card-text {
+    font-size: 12px;
+  }
+}

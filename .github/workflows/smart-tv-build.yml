@@ -155,7 +155,7 @@ jobs:
             --arg version "$VERSION" \
             --arg ipk "$repo/releases/download/$RELEASE/jinbei-studio-webos-$VERSION.ipk" \
             --arg sha256 "$(sha256sum feed/jinbei-studio-webos.ipk | cut -d' ' -f1)" \
-            --arg icon "$raw/main/packages/smart-tv/webos/largeIcon.png" \
+            --arg icon "$raw/main/packages/smart-tv/webos/jinbei-largeIcon.png" \
             --arg source "$repo" \
             '$app[0] as $a | {packages: [{
               id: $a.id, title: $a.title, iconUri: $icon,

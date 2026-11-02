@@ -698,11 +698,13 @@ export function UserPicker({
   onPick,
   links = [],
   onChangeServer,
+  onSignOut,
 }: {
   users: PickableUser[];
   onPick: (userId: string, secret?: string) => Promise<void>;
   links?: SignInLink[];
   onChangeServer?: () => void;
+  onSignOut?: () => void;
 }) {
   const [busy, setBusy] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
@@ -830,6 +832,7 @@ export function UserPicker({
                       label: t`Change server`,
                       onClick: onChangeServer,
                     },
+                    !!onSignOut && { label: t`Sign out`, onClick: onSignOut },
                   ]}
                 />
               </motion.div>
