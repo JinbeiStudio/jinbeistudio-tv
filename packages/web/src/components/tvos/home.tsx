@@ -178,6 +178,7 @@ const Hero = React.memo(function Hero({
   }, [heads, resume.data, nextUp.data, sources.join()]);
 
   const [index, setIndex] = React.useState(0);
+  const [heroSeconds] = useSetting(settings.interface.heroSeconds);
   const [heroRef, heroFocused] = useFocusWithin<HTMLDivElement>();
   const saverOn = useSaverOn();
   // The hero moves on by itself until it is focused, and not while down in the rows.
@@ -185,10 +186,10 @@ const Hero = React.memo(function Hero({
     if (heroFocused || lowered || !shown || saverOn || hero.length < 2) return;
     const timer = window.setInterval(
       () => setIndex((i) => (i + 1) % hero.length),
-      9000
+      heroSeconds * 1000
     );
     return () => window.clearInterval(timer);
-  }, [heroFocused, lowered, shown, saverOn, hero.length]);
+  }, [heroFocused, lowered, shown, saverOn, hero.length, heroSeconds]);
   const current = hero[index % Math.max(hero.length, 1)];
 
   return (
