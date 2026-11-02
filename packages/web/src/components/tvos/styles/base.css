@@ -297,6 +297,8 @@ html[data-tv] .tv-glass.tv-edge-capsule {
   flex: none;
   display: flex;
   flex-direction: column;
+  /* webOS's Chromium 120 aligns a button's items to the start, so long one-line names spilled past the card. */
+  align-items: stretch;
   gap: 0.6vw;
   padding: 0;
   border: 0;
