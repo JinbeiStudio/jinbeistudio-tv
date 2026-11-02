@@ -1,11 +1,11 @@
 import { t } from '@lingui/core/macro';
-import { tagLanguageName } from '../languages';
 import { storage } from '../storage';
 import type { JellyfinClient } from '../client';
 import type { Chapter } from './chapters';
 import type { SubtitleStyle } from '../settings';
 import type { SubtitleLine } from '../subtitles/cues';
-import type { SubtitleFacts } from '../subtitles/tracks';
+import { subtitleType, type SubtitleFacts } from '../subtitles/tracks';
+import { tagName } from '../languages';
 import type { Playhead } from './playhead';
 import type { ThumbnailFeed } from './thumbnails';
 import type { PlannedSkip } from './engine';
@@ -15,13 +15,13 @@ import type { BaseItemDto, MediaStream, SourceInfo } from '../types';
 export interface Track {
   id: string;
   label: string;
+  /** A smaller line under the label. */
+  detail?: string;
   lang?: string;
   /** One of the file's own, rather than one loaded beside it. */
   file?: boolean;
   /** A subtitle's title and flags, which its type is read from. */
   facts?: SubtitleFacts;
-  /** A second, quieter line under the label, such as where a subtitle comes from. */
-  detail?: string;
 }
 
 export interface PlayerState {
@@ -195,26 +195,47 @@ export function initialState(source: SourceInfo): PlayerState {
   };
 }
 
-/** An audio track named by the server's title for it. */
 export function trackLabel(stream: MediaStream, n: number): string {
   return (
     stream.DisplayTitle || stream.Title || stream.Language || t`Track ${n}`
   );
 }
 
-/** A subtitle named by its language and kind; where it comes from goes in `detail`. */
-export function subtitleName(
-  stream: Pick<MediaStream, 'Language' | 'IsForced' | 'IsHearingImpaired'>,
-  n: number
-): string {
-  const language = tagLanguageName(stream.Language);
-  return [
-    language ?? t`Track ${n}`,
-    stream.IsForced ? t`Forced` : undefined,
-    stream.IsHearingImpaired ? t`SDH` : undefined,
-  ]
-    .filter(Boolean)
-    .join(' · ');
+interface RowFacts extends SubtitleFacts {
+  lang?: string | null;
+}
+
+export function trackRow(
+  track: RowFacts,
+  kind: 'audio' | 'subtitle',
+  fallback: string
+): Pick<Track, 'label' | 'detail'> {
+  const language = track.lang ? tagName(track.lang) : undefined;
+  const title = track.title?.trim();
+  const own =
+    title &&
+    ![language, track.lang].some(
+      (name) => name?.toLowerCase() === title.toLowerCase()
+    )
+      ? title
+      : undefined;
+  const type = kind === 'subtitle' ? subtitleType(track) : undefined;
+  const typeLabel =
+    type === 'sdh'
+      ? t`SDH`
+      : type === 'forced'
+        ? t`Forced`
+        : type === 'signs'
+          ? t`Signs and songs`
+          : type === 'commentary'
+            ? t`Commentary`
+            : undefined;
+  return {
+    label: [language ?? t`Unknown language`, typeLabel]
+      .filter(Boolean)
+      .join(' · '),
+    detail: own ?? (language ? undefined : fallback),
+  };
 }
 
 /** A track as the player itself lists it. */

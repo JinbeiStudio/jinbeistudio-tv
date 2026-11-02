@@ -26,7 +26,8 @@ import type { Chapter } from './chapters';
 import {
   initialState,
   storedVolume,
-  subtitleName,
+  trackLabel,
+  trackRow,
   VOLUME_KEY,
   type PlayerController,
   type PlayerOptions,
@@ -58,7 +59,6 @@ const THUMBNAIL_INDEX_MS = 5_000;
 /** How long subtitles stay at a newly picked height while the controls show. */
 const PLACING_MS = 3_000;
 
-/** The subtitles the server can send, which the page loads itself. */
 function serverSubtitles(
   client: JellyfinClient,
   source: SourceInfo,
@@ -74,8 +74,7 @@ function serverSubtitles(
             {
               id: `server:${stream.Index}`,
               url,
-              label: subtitleName(stream, i + 1),
-              detail: t`External`,
+              label: trackLabel(stream, i + 1),
               lang: stream.Language ?? undefined,
               stream,
             },
@@ -84,11 +83,25 @@ function serverSubtitles(
     });
 }
 
-const asTrack = ({ id, label, lang, detail }: Track): Track => ({
-  id,
-  label,
-  lang,
-  detail,
+const asTrack = (track: EngineTrack): Track => ({
+  id: track.id,
+  lang: track.lang,
+  ...trackRow(track, track.type, track.label),
+});
+
+const serverTrack = (s: ServerSubtitle): Track => ({
+  id: s.id,
+  lang: s.lang,
+  ...trackRow(
+    {
+      lang: s.stream.Language,
+      title: s.stream.Title,
+      forced: s.stream.IsForced,
+      hearingImpaired: s.stream.IsHearingImpaired,
+    },
+    'subtitle',
+    s.label
+  ),
 });
 
 /** A subtitle's copy stretched to the video's frame rate, which shows in its place. */
@@ -552,7 +565,7 @@ export function usePlayer(
       ...subtitleTracks
         .filter((t) => !t.external)
         .map((t) => ({ ...asTrack(t), file: true, facts: trackFacts(t) })),
-      ...servers.map((s) => ({ ...asTrack(s), facts: serverFacts(s) })),
+      ...servers.map((s) => ({ ...serverTrack(s), facts: serverFacts(s) })),
       ...subtitleTracks
         .filter(
           (t) =>

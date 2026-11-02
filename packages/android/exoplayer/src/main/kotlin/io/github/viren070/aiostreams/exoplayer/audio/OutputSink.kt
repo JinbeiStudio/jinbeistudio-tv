@@ -3,6 +3,7 @@ package io.github.viren070.aiostreams.exoplayer.audio
 import androidx.annotation.OptIn
 import androidx.media3.common.Format
 import androidx.media3.common.MimeTypes
+import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.audio.AudioSink
 import androidx.media3.exoplayer.audio.ForwardingAudioSink
@@ -10,7 +11,7 @@ import androidx.media3.exoplayer.audio.ForwardingAudioSink
 /** Passes through only the formats the page allows, and delays the sound against the picture. */
 @OptIn(UnstableApi::class)
 internal class OutputSink(sink: AudioSink) : ForwardingAudioSink(sink) {
-    /** The sample types passed through, from mpv's `audio-spdif` list; read from the next track picked. */
+    /** The sample types passed through, from mpv's `audio-spdif` list. */
     @Volatile
     var passthrough: Set<String> = emptySet()
         private set
@@ -18,9 +19,34 @@ internal class OutputSink(sink: AudioSink) : ForwardingAudioSink(sink) {
     @Volatile
     var delayUs = 0L
 
-    fun setSpdif(names: List<String>) {
-        passthrough = names.flatMapTo(mutableSetOf()) { SPDIF[it].orEmpty() }
+    @Volatile
+    private var listener: AudioSink.Listener? = null
+
+    override fun setListener(listener: AudioSink.Listener) {
+        this.listener = listener
+        super.setListener(listener)
     }
+
+    fun setSpdif(names: List<String>) {
+        val next = names.flatMapTo(mutableSetOf()) { SPDIF[it].orEmpty() }
+        if (next == passthrough) return
+        passthrough = next
+        // Picks the track's output again, so a changed setting applies at once.
+        listener?.onAudioCapabilitiesChanged()
+    }
+
+    private var stretching = false
+
+    override fun setPlaybackParameters(playbackParameters: PlaybackParameters) {
+        super.setPlaybackParameters(playbackParameters)
+        val next = playbackParameters.speed != 1f
+        if (next == stretching) return
+        stretching = next
+        listener?.onAudioCapabilitiesChanged()
+    }
+
+    /** Sound the output would take as it is, which the app decodes instead while the speed isn't normal: encoded sound can't change speed. */
+    fun decodesForSpeed(format: Format) = stretching && format.sampleMimeType in passthrough && super.supportsFormat(format)
 
     private fun allowed(format: Format) = format.sampleMimeType == MimeTypes.AUDIO_RAW || format.sampleMimeType in passthrough
 

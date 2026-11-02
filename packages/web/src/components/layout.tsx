@@ -841,13 +841,19 @@ function MobileNav({
   // The same height either way, as pages keep the bar's room free.
   const tab = cn(
     'gap-0.5 rounded-full px-1 text-[0.65rem]',
-    named ? 'flex-1 py-1.5' : 'w-14 py-3.5'
+    named ? 'flex-1 py-1.5' : 'w-12 py-3'
   );
+  const nav = React.useRef<HTMLElement>(null);
+  const [away, show] = useScrollAway(nav, true);
   return (
     <nav
+      ref={nav}
       data-ui="mobile-nav"
+      data-names={named ? 'shown' : 'hidden'}
+      data-away={away || undefined}
+      onFocus={show}
       className={cn(
-        'pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]',
+        'pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center px-3 pb-[calc(0.25rem+env(safe-area-inset-bottom))] transition-transform duration-200 ease-out will-change-transform data-[away]:translate-y-full',
         !wide && 'lg:hidden'
       )}
     >
@@ -864,7 +870,7 @@ function MobileNav({
               key={item.id}
               data-ui="mobile-nav-item"
               item={item}
-              icon={Icon && <Icon className="text-xl" />}
+              icon={Icon && <Icon className={named ? 'text-xl' : 'text-2xl'} />}
               onClick={select(item)}
               named={named}
               className={tab}
@@ -945,7 +951,7 @@ function TouchRail({
       >
         <BarSurface
           className={cn(
-            'pointer-events-auto flex max-h-full flex-col gap-1 overflow-y-auto rounded-[1.375rem] p-1.5',
+            'pointer-events-auto flex max-h-full flex-col gap-1 overflow-y-auto rounded-[1.375rem] p-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
             named ? 'w-[calc(4.75rem+2px)]' : 'w-[calc(3.75rem+2px)]'
           )}
         >
@@ -960,7 +966,7 @@ function TouchRail({
   return (
     <nav
       data-ui="touch-rail"
-      className="flex h-full flex-col items-center gap-1 overflow-y-auto px-1 pb-[calc(0.75rem+env(safe-area-inset-bottom))]"
+      className="flex h-full flex-col items-center gap-1 overflow-y-auto px-1 pb-[calc(0.75rem+env(safe-area-inset-bottom))] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     >
       <Logo />
       {items.map(railItem)}

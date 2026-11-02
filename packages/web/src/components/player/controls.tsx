@@ -30,6 +30,7 @@ import {
   MiddleButton,
   PlayerAction,
 } from './buttons';
+import { ChaptersSheet } from './chapters';
 import { EpisodesSheet } from './episodes';
 import { PlaylistSheet } from '../playlists';
 import {
@@ -55,6 +56,7 @@ import { Volume } from './volume';
 import { usePlayhead, type Playhead } from '../../lib/playback/playhead';
 
 const IDLE_MS = 5000;
+const BRIEF_IDLE_MS = 1500;
 
 /** Presses closer than this are a held key's repeats. */
 const HELD_GAP_MS = 250;
@@ -107,7 +109,7 @@ export function PlayerControls({
   const tv = !!currentHost().tv;
   const root = React.useRef<HTMLDivElement>(null);
   const bottomBar = React.useRef<HTMLDivElement>(null);
-  const { idle, hidden, wake, hide } = useIdle(IDLE_MS);
+  const { idle, hidden, wake, hide, soon, brief } = useIdle(IDLE_MS);
   // Some TVs' web views report a coarse pointer.
   const [touch, setTouch] = React.useState(
     () => !tv && matchMedia('(pointer: coarse)').matches
@@ -121,6 +123,7 @@ export function PlayerControls({
   } | null>(null);
   const [byEar, setByEar] = React.useState(false);
   const [episodes, setEpisodes] = React.useState(false);
+  const [chapters, setChapters] = React.useState(false);
   const [listing, setListing] = React.useState(false);
   const [scrub, setScrub] = React.useState<{
     fromMs: number;
@@ -136,6 +139,7 @@ export function PlayerControls({
     picking !== null ||
     byEar ||
     episodes ||
+    chapters ||
     listing ||
     scrub !== null;
   // Paused and left alone, the controls give way to what's playing.
@@ -159,6 +163,12 @@ export function PlayerControls({
   React.useEffect(() => {
     if (ready && !latest.current.state.paused) hide();
   }, [ready, latest, hide]);
+  const wasPaused = React.useRef<boolean | null>(null);
+  React.useEffect(() => {
+    if (!ready) return;
+    if (wasPaused.current && !state.paused) soon(BRIEF_IDLE_MS);
+    wasPaused.current = state.paused;
+  }, [ready, state.paused, soon]);
   useWindowButtons(visible);
   useFocusInside(root, visible, wake);
   useLiftSubtitles(player, bottomBar, visible);
@@ -177,6 +187,7 @@ export function PlayerControls({
   };
 
   const [seekStep] = useSetting(settings.controls.seekStep);
+  const [clock] = useSetting(settings.controls.clock);
   const [burstSeek, seekingTo] = useBurstSeek(player);
   const [seekPicture, setSeekPicture] = React.useState(true);
   const seekBy = (deltaMs: number, picture = true) => {
@@ -201,7 +212,8 @@ export function PlayerControls({
     const last = scrubbing.current;
     if (!last && !(thumbnails?.row() && (repeat || state.paused))) {
       if (seekingTo === null) skippedFrom.current = playhead.positionMs;
-      return seekBy(deltaMs * steps, false);
+      seekBy(deltaMs * steps, false);
+      return false;
     }
     if (!last && !state.paused) togglePlay();
     const fromMs =
@@ -217,6 +229,7 @@ export function PlayerControls({
       resume: last ? last.resume : !state.paused,
     };
     setScrub(scrubbing.current);
+    return true;
   };
   /** Plays from a remote's scrub, or drops it; false without one. */
   const endScrub = (commit: boolean) => {
@@ -255,6 +268,7 @@ export function PlayerControls({
     setPicking(null);
   };
   const closeByEar = React.useCallback(() => setByEar(false), []);
+  const closeChapters = React.useCallback(() => setChapters(false), []);
 
   const fileInput = React.useRef<HTMLInputElement>(null);
   const addSubtitleFile = (file: File) =>
@@ -316,11 +330,19 @@ export function PlayerControls({
     ready,
     visible,
     wake,
+    glance: () => {
+      wake();
+      soon(BRIEF_IDLE_MS);
+    },
+    glancing: () => brief.current,
     hide,
     notice: showNotice,
     togglePlay,
-    seekBy: (deltaMs, held) =>
-      tv ? remoteStep(deltaMs, held) : seekBy(deltaMs, false),
+    seekBy: (deltaMs, held) => {
+      if (tv) return remoteStep(deltaMs, held);
+      seekBy(deltaMs, false);
+      return false;
+    },
     endScrub,
     onBack,
     onPrevious,
@@ -336,6 +358,7 @@ export function PlayerControls({
   );
   const isEpisode = item.Type === 'Episode';
   const listsEpisodes = isEpisode && !!item.SeriesId && !!onEpisode;
+  const listsChapters = (player.chapters?.length ?? 0) > 1;
   const stepping = steps ?? (isEpisode ? 'episode' : undefined);
   const stepLabels = {
     episode: [t`Previous episode`, t`Next episode`],
@@ -481,11 +504,12 @@ export function PlayerControls({
             </p>
           )}
         </div>
+        {clock && <PlayerClock />}
         {touch && !tv && (
           <ControlButton
             name="lock"
             label={t`Lock screen`}
-            className="ms-auto"
+            className={clock ? undefined : 'ms-auto'}
             onClick={() => {
               setLocked(true);
               hide();
@@ -671,6 +695,7 @@ export function PlayerControls({
             onMenu={onMenu}
             onVersions={onVersions}
             onEpisodes={listsEpisodes ? () => setEpisodes(true) : undefined}
+            onChapters={listsChapters ? () => setChapters(true) : undefined}
             onPlaylist={playlist ? () => setListing(true) : undefined}
             onAddFile={() => fileInput.current?.click()}
             onSyncByEar={() => setByEar(true)}
@@ -688,6 +713,15 @@ export function PlayerControls({
           loadingId={loadingEpisode}
           onPlay={onEpisode}
           onClose={() => setEpisodes(false)}
+        />
+      )}
+
+      {listsChapters && (
+        <ChaptersSheet
+          item={item}
+          player={player}
+          open={chapters}
+          onClose={closeChapters}
         />
       )}
 
@@ -836,6 +870,30 @@ function PlayerTime({
         <span className="text-gray-400"> / {clock(durationMs)}</span>
       )}
     </button>
+  );
+}
+
+function PlayerClock() {
+  const [now, setNow] = React.useState(() => new Date());
+  React.useEffect(() => {
+    let timer = 0;
+    const next = () => {
+      setNow(new Date());
+      timer = window.setTimeout(next, 60_000 - (Date.now() % 60_000));
+    };
+    timer = window.setTimeout(next, 60_000 - (Date.now() % 60_000));
+    return () => window.clearTimeout(timer);
+  }, []);
+  return (
+    <p
+      data-ui="player-clock"
+      className="ms-auto whitespace-nowrap text-[length:var(--title)] font-semibold tabular-nums"
+    >
+      {now.toLocaleTimeString(formatLocale(), {
+        hour: 'numeric',
+        minute: '2-digit',
+      })}
+    </p>
   );
 }
 

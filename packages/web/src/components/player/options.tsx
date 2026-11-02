@@ -37,9 +37,7 @@ import {
   DropdownMenuLabel,
 } from '@aiostreams/ui/dropdown-menu';
 import { cn } from '@aiostreams/ui/core/styling';
-import { clock } from '../../lib/format';
 import { currentHost } from '../../lib/hosts';
-import { chapterAt } from '../../lib/playback/chapters';
 import type { PlayerController, Track } from '../../lib/playback/controller';
 import {
   settings,
@@ -69,7 +67,6 @@ import { subtitleLanguages, usePlaybackPrefs } from '../../lib/user-config';
 import { ControlButton } from './buttons';
 import { useParty } from '../../lib/party/party';
 import { RATES, rateLabel } from './keys';
-import { usePlayhead } from '../../lib/playback/playhead';
 import { useLatest } from '../../lib/use-latest';
 
 /** Opens in the menu's place from a row under its list. */
@@ -147,10 +144,13 @@ function Menu({
           (value ?? '') === option.id ? 'opacity-100' : 'opacity-0'
         )}
       />
-      <span className="flex min-w-0 flex-col">
-        <span className="[overflow-wrap:anywhere]">{option.label}</span>
+      <span className="min-w-0 [overflow-wrap:anywhere]">
+        {option.label}
         {option.detail && (
-          <span className="truncate text-xs text-[--muted]">
+          <span
+            data-name="detail"
+            className="line-clamp-2 text-[0.8em] text-gray-400"
+          >
             {option.detail}
           </span>
         )}
@@ -609,6 +609,7 @@ export function OptionButtons({
   onMenu,
   onVersions,
   onEpisodes,
+  onChapters,
   onPlaylist,
   onAddFile,
   onSyncByEar,
@@ -621,6 +622,7 @@ export function OptionButtons({
   onParty?: () => void;
   onVersions?: () => void;
   onEpisodes?: () => void;
+  onChapters?: () => void;
   onPlaylist?: () => void;
   onAddFile(): void;
   onSyncByEar(): void;
@@ -643,10 +645,6 @@ export function OptionButtons({
     prefs.ListPreferredSubtitlesOnly === false
       ? { shown: byPreference, hidden: [] }
       : splitByLanguage(byPreference, languages, state.subtitle);
-  const chapters = player.chapters ?? [];
-  const chapter = usePlayhead(player.playhead, (h) =>
-    chapterAt(chapters, h.positionMs)
-  );
   const tv = !!currentHost().tv;
   const unread = useParty()?.unread ?? 0;
   const hidden = subtitles.hidden.length;
@@ -678,20 +676,10 @@ export function OptionButtons({
           <LuGalleryVerticalEnd />
         </ControlButton>
       )}
-      {chapters.length > 1 && (
-        <Menu
-          name="chapters"
-          label={t`Chapters`}
-          icon={<LuListOrdered />}
-          options={chapters.map((c, i) => {
-            const number = i + 1;
-            const title = c.title || t`Chapter ${number}`;
-            return { id: String(i), label: `${title} · ${clock(c.startMs)}` };
-          })}
-          value={String(chapter)}
-          onSelect={(id) => id && player.seek(chapters[Number(id)].startMs)}
-          {...menuState('chapters')}
-        />
+      {onChapters && (
+        <ControlButton name="chapters" label={t`Chapters`} onClick={onChapters}>
+          <LuListOrdered />
+        </ControlButton>
       )}
       {onVersions && (
         <ControlButton name="versions" label={t`Versions`} onClick={onVersions}>
