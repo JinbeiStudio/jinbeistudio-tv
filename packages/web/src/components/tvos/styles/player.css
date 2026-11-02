@@ -689,3 +689,27 @@ html[data-tvos-build] [data-ui='pause-overview'] {
   color: rgba(255, 255, 255, 0.65);
   -webkit-line-clamp: 3;
 }
+
+/* The clock in the top bar: white over the shade, the size of the title's episode line. */
+html[data-tvos-build] [data-ui='player-clock'] {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+}
+
+/* The chapters sheet: rounded rows, the focused one white as in our other side sheets (no easing, for the TV). */
+html[data-tvos-build] [data-ui='player-chapter'] {
+  border-radius: 0.9rem;
+  transition: none;
+}
+html[data-tvos-build] [data-ui='player-chapter']:focus-visible:not(#_) {
+  outline: none !important;
+  --tw-ring-shadow: 0 0 #0000 !important;
+  box-shadow: 0 0.5rem 1.2rem rgba(0, 0, 0, 0.35) !important;
+  background: rgba(255, 255, 255, 0.95);
+}
+html[data-tvos-build] [data-ui='player-chapter']:focus-visible:not(#_),
+html[data-tvos-build] [data-ui='player-chapter']:focus-visible:not(#_) * {
+  color: #000 !important;
+}
