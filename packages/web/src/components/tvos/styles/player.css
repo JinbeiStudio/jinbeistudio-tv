@@ -755,7 +755,8 @@ html[data-tvos-build] [data-ui='mini-player-title'] [data-name='detail'] {
   color: rgba(255, 255, 255, 0.7);
 }
 html[data-tvos-build] [data-ui='mini-player-progress'] {
-  background: rgba(255, 255, 255, 0.2);
+  /* Only what played shows: an empty track read as a border on the glass. */
+  background: transparent;
 }
 html[data-tvos-build] [data-ui='mini-player-progress-fill'] {
   background: #fff;
