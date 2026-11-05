@@ -15,7 +15,16 @@ import { isTextField, runAction, useAction } from '../../lib/input';
 import { useServerEvents } from '../../lib/server-events';
 import { PageShown } from '../../lib/page-shown';
 import { markTvosStyle } from '../../lib/tvos-style';
-import { ConnectionNote, PageScroll, PagesWork, pageName } from '../layout';
+import {
+  ConnectionNote,
+  PageScroll,
+  PagesWork,
+  pageName,
+  usePlayerLeaving,
+} from '../layout';
+import { closePlayback, usePlayback } from '../../lib/playback/session';
+import { useSession } from '../../lib/session';
+import { PlayerPage } from '../../pages/player';
 import { ItemMenuHost } from '../item-menu';
 import { PartyHost } from '../party/party-host';
 import { PlaylistsHost } from '../playlists';
@@ -251,6 +260,11 @@ export function TvosLayout() {
     select: (matches) => !!matches[0]?.pathname.startsWith('/play/'),
   });
   useServerEvents(playing);
+  // As upstream's layout: the player is drawn here, and plays on in the mini player where the device allows it.
+  const { user } = useSession();
+  const playback = usePlayback();
+  usePlayerLeaving();
+  React.useEffect(() => closePlayback, [user.Id]);
   // Menus and dialogs open outside the page, so the whole document says the tvOS style is on.
   // Left as the setting says when the layout goes (sign-out, who's watching), so those screens keep the look.
   React.useEffect(() => {
@@ -452,7 +466,7 @@ export function TvosLayout() {
   }, []);
   return (
     <>
-      {!playing && <PagesWork pathname={pathname} />}
+      {!playing && <PagesWork pathname={pathname} playing={!!playback} />}
       <div
         data-ui="shell"
         data-tvos=""
@@ -543,6 +557,16 @@ export function TvosLayout() {
         <ConnectionNote />
       </div>
       {playing && <Outlet />}
+      {playback && (
+        <PlayerPage
+          key={`${playback.itemId}|${playback.sourceId}|${playback.playlist ?? ''}`}
+          itemId={playback.itemId}
+          sourceId={playback.sourceId}
+          startMs={playback.startMs}
+          playlist={playback.playlist}
+          mini={playback.mini}
+        />
+      )}
       <React.Suspense fallback={null}>
         {playing && <TvosPlayerInfo />}
         <TvosScreensaver playing={playing} />
