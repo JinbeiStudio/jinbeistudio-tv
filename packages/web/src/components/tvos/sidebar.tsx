@@ -12,10 +12,11 @@ import {
   BiLibrary,
   BiListUl,
   BiSearch,
+  BiTv,
 } from 'react-icons/bi';
 import { formatLocale } from '../../lib/i18n';
 import { useSession } from '../../lib/session';
-import { useOwnAvatar } from '../../lib/queries';
+import { useLiveTvView, useOwnAvatar } from '../../lib/queries';
 import { navigate, to } from '../../lib/paths';
 import { downloadsHost } from '../../lib/downloads';
 import { useParty } from '../../lib/party/party';
@@ -58,6 +59,12 @@ const SECTIONS: Record<string, Section> = {
     path: to.favourites(),
     match: (p) => p.startsWith('/favourites'),
   },
+  live: {
+    name: 'Live TV',
+    icon: BiTv,
+    path: to.live(),
+    match: (p) => p.startsWith('/live'),
+  },
   calendar: {
     name: 'Calendar',
     icon: BiCalendar,
@@ -95,11 +102,13 @@ export function Sidebar({
   const { user, switchUser } = useSession();
   // The app's other sections, where it offers them.
   const inParty = !!useParty();
+  const live = !!useLiveTvView().data;
   const sections: Section[] = [
     SECTIONS.home!,
     SECTIONS.discover!,
     SECTIONS.search!,
     SECTIONS.library!,
+    ...(live ? [SECTIONS.live!] : []),
     SECTIONS.calendar!,
     SECTIONS.history!,
     { name: 'Playlists', icon: BiListUl, open: openPlaylists },

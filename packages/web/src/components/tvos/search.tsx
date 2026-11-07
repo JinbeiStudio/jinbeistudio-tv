@@ -10,7 +10,17 @@ import {
 } from '@aiostreams/ui/context-menu';
 import { settings, useSetting } from '../../lib/settings';
 import { useAction } from '../../lib/input';
-import { useSearch, useSearchSuggestions } from '../../lib/queries';
+import {
+  useLiveTvView,
+  useSearch,
+  useSearchSuggestions,
+} from '../../lib/queries';
+import { airedShare, airingAt, useNow, useSchedules } from '../../lib/live-tv';
+import { posterUrl } from '../../lib/images';
+import { BATCH } from '../channel-list';
+import { CachedImage } from '../cached-image';
+import { ItemMenu } from '../item-menu';
+import { useVersionPicker } from '../version-picker';
 import { useSession } from '../../lib/session';
 import { useSearchHistory } from '../../lib/search-history';
 import { goBack, itemPath, navigate, to } from '../../lib/paths';
@@ -20,7 +30,7 @@ import {
   useKeyboardCompletions,
   useVoice,
 } from '../../pages/search';
-import { PersonCard, PosterCard, Row, Spinner } from './parts';
+import { ArtTile, PersonCard, PosterCard, Row, Spinner } from './parts';
 import { tr } from './i18n';
 
 /**
@@ -40,6 +50,9 @@ export function TvosSearch({ initialTerm }: { initialTerm: string }) {
   const movies = useSearch(settled, 'Movie', !combine);
   const shows = useSearch(settled, 'Series', !combine);
   const people = useSearch(settled, 'Person');
+  // As the app's: channels too, where the server has Live TV.
+  const live = !!useLiveTvView().data;
+  const channels = useSearch(settled, 'TvChannel', live);
   const history = useSearchHistory(user.Id!);
   // As the app's: titles the typing could mean, offered before it settles, and to a TV's own keyboard.
   const suggesting = typed !== chosen;
@@ -77,6 +90,7 @@ export function TvosSearch({ initialTerm }: { initialTerm: string }) {
     movies: combine ? [] : list(movies),
     shows: combine ? [] : list(shows),
     people: named.map(({ person }) => person),
+    channels: live ? list(channels) : [],
   };
   const loading =
     searching &&
@@ -87,7 +101,8 @@ export function TvosSearch({ initialTerm }: { initialTerm: string }) {
     found.mixed.length +
       found.movies.length +
       found.shows.length +
-      found.people.length >
+      found.people.length +
+      found.channels.length >
     0;
 
   // Back (Esc or the remote's) leaves search at once, even from the field, rather than only unfocusing it.
@@ -217,6 +232,12 @@ export function TvosSearch({ initialTerm }: { initialTerm: string }) {
             </Row>
           )}
           {!peopleFirst && peopleRow}
+          {found.channels.length > 0 && (
+            <ChannelRow
+              channels={found.channels}
+              onPlay={() => history.add(settled)}
+            />
+          )}
           {!loading && !any && (
             <div className="tv-note">
               {tr('No results for “{term}”', { term: settled })}
@@ -225,5 +246,65 @@ export function TvosSearch({ initialTerm }: { initialTerm: string }) {
         </div>
       )}
     </div>
+  );
+}
+
+/** Channels found, each showing what is on now over its logo; Select plays it. */
+function ChannelRow({
+  channels,
+  onPlay,
+}: {
+  channels: BaseItemDto[];
+  onPlay: () => void;
+}) {
+  const { client } = useSession();
+  const picker = useVersionPicker();
+  const schedules = useSchedules([channels.slice(0, BATCH).map((c) => c.Id!)]);
+  const now = useNow();
+  return (
+    <Row title={tr('Channels')} shape="wide">
+      {channels.map((channel) => {
+        const programmes = schedules.get(channel.Id!);
+        const programme =
+          (programmes && airingAt(programmes, now)) ??
+          (channel.CurrentProgram && airingAt([channel.CurrentProgram], now));
+        const logo = posterUrl(client, channel, { maxWidth: 240 });
+        return (
+          <ItemMenu key={channel.Id} item={channel}>
+            <button
+              type="button"
+              className="tv-card tv-wide tv-channel"
+              data-focus="own"
+              onClick={() => {
+                onPlay();
+                picker.play(channel);
+              }}
+            >
+              <ArtTile>
+                {logo && <CachedImage src={logo} alt="" />}
+                <div className="tv-overlay">
+                  <strong>
+                    {channel.ChannelNumber && (
+                      <small>{channel.ChannelNumber} </small>
+                    )}
+                    {channel.Name}
+                  </strong>
+                  {programme?.Name && <span>{programme.Name}</span>}
+                  {programme && (
+                    <div className="tv-progress">
+                      <i
+                        style={{
+                          width: `${airedShare(programme, now) * 100}%`,
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+              </ArtTile>
+            </button>
+          </ItemMenu>
+        );
+      })}
+    </Row>
   );
 }

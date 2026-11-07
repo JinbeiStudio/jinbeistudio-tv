@@ -21,6 +21,9 @@ const TvosCatalog = React.lazy(() =>
 const TvosLibrary = React.lazy(() =>
   import('./library').then((m) => ({ default: m.TvosLibrary }))
 );
+const TvosLive = React.lazy(() =>
+  import('./live').then((m) => ({ default: m.TvosLive }))
+);
 const TvosSearch = React.lazy(() =>
   import('./search').then((m) => ({ default: m.TvosSearch }))
 );
@@ -46,6 +49,7 @@ const PATHS = [
   '/history',
   '/favourites',
   '/calendar',
+  '/live',
   '/search',
   '/discover/$viewId',
   '/item/$itemId',
@@ -63,6 +67,8 @@ function tvosPage({ routeId, params, search }: Match): React.ReactNode {
       return <TvosLibrary kind={search.kind} />;
     case '/calendar':
       return <TvosCalendar month={search.month} />;
+    case '/live':
+      return <TvosLive group={search.group} view={search.view} />;
     case '/search':
       return <TvosSearch initialTerm={search.q ?? ''} />;
     case '/discover/$viewId':

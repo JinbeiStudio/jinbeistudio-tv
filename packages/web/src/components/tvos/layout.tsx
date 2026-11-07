@@ -31,6 +31,7 @@ import { PlaylistsHost } from '../playlists';
 import { RandomPick } from '../random-pick';
 import { RemoteSheet } from '../remote-sheet';
 import { RemoteTarget } from '../remote-target';
+import { ReminderHost } from '../live-reminders';
 import { VersionPickerProvider } from '../version-picker';
 import { WatchNextSync } from '../watch-next';
 import { GlideLayers } from '../glide-layers';
@@ -475,6 +476,7 @@ export function TvosLayout() {
       >
         <VersionPickerProvider>
           <RemoteTarget />
+          <ReminderHost />
           <RandomPick />
           <PlaylistsHost />
           {currentHost().watchNext && <WatchNextSync />}

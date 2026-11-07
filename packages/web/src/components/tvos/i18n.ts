@@ -22,6 +22,8 @@ const FR: Record<string, string> = {
   Discover: 'Découvrir',
   Search: 'Rechercher',
   Library: 'Bibliothèque',
+  'Live TV': 'TV en direct',
+  Channels: 'Chaînes',
   Calendar: 'Calendrier',
   History: 'Historique',
   Settings: 'Réglages',

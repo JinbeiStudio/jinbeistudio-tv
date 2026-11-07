@@ -1,0 +1,118 @@
+/* The app's Live TV in the tvOS style: our title and gutters, white focus, rounded glass windows. */
+
+/* The page fills the screen under our top bar; only the list or the guide scrolls. */
+.tv-live [data-ui='live-tv'] {
+  height: 100vh;
+  padding: 4.2vw var(--tv-gutter) 0;
+  gap: 1.6vw;
+}
+.tv-live [data-ui='page-title'] {
+  font-size: 2.5vw;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.tv-live [data-ui='live-controls'] {
+  gap: 1vw;
+}
+
+/* Groups and views: our glass pills, white when chosen or focused. */
+.tv-live [data-ui='pill-tabs'] {
+  gap: 0.4vw;
+  padding: 0.3vw;
+  background: var(--tv-glass);
+}
+.tv-live [data-ui='pill-tab'] {
+  height: auto;
+  padding: 0.55vw 1.2vw;
+  font-size: 1.05vw;
+  font-weight: 600;
+  background: transparent;
+  color: #fff;
+}
+.tv-live [data-ui='pill-tab'][data-selected] {
+  background: rgba(255, 255, 255, 0.28);
+}
+.tv-live [data-ui='pill-tab']:is(:focus-visible, :hover) {
+  background: #fff;
+  color: #000;
+}
+
+/* Channels: a flat dark panel rather than blur, since it scrolls over the moving sea. */
+.tv-live [data-ui='channel-list'] {
+  border-radius: 1.4vw;
+  background: rgba(20, 20, 24, 0.55);
+}
+.tv-live [data-ui='channel-row'] > div {
+  border-radius: 0.9vw;
+  transition: none;
+}
+.tv-live [data-ui='channel-row'] p {
+  font-size: 1vw;
+}
+.tv-live [data-ui='channel-row'] [data-name='number'] {
+  font-size: 0.85vw;
+}
+/* The row the remote is on: white, black text, as tvOS lists draw focus. */
+.tv-live [data-ui='channel-row'][data-active] > div {
+  background: #fff;
+  color: #000;
+}
+.tv-live [data-ui='channel-row'][data-active] :is(p, span) {
+  color: #000;
+}
+.tv-live [data-ui='channel-row'][data-active] [data-name='number'] {
+  color: rgba(0, 0, 0, 0.55);
+}
+
+/* The playing channel's window and the programme beside it. */
+.tv-live [data-ui='live-preview'] {
+  border-radius: 1.2vw;
+  box-shadow: 0 1.2vw 2.4vw rgba(0, 0, 0, 0.45);
+}
+.tv-live [data-ui='live-preview']:focus-visible {
+  --tw-ring-shadow: 0 0 #0000;
+  outline: 0.25vw solid #fff;
+  outline-offset: 0.3vw;
+}
+.tv-live [data-ui='channel-details'] h2,
+.tv-live [data-ui='programme-details'] h2 {
+  font-size: 2vw;
+  font-weight: 700;
+}
+.tv-live :is([data-ui='channel-details'], [data-ui='programme-details']) p {
+  font-size: 1.05vw;
+}
+.tv-live [data-ui='channel-details'] .bg-white {
+  background: #fff;
+}
+
+/* Channels found by search: the logo whole above the name, not cropped like artwork. */
+.tv-channel .tv-art > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 1.2vw 3vw 3.4vw;
+}
+.tv-channel .tv-overlay small {
+  opacity: 0.6;
+}
+
+/* The guide: rounded cells, the focused one white. */
+.tv-live [data-ui='guide'] {
+  border-radius: 1.4vw;
+  background: rgba(20, 20, 24, 0.55);
+}
+.tv-live [data-ui='guide-cell'] {
+  border-radius: 0.7vw;
+  transition: none;
+}
+.tv-live [data-ui='guide-cell']:is(:focus, :focus-visible) {
+  background: #fff;
+  color: #000;
+  outline: none;
+}
+.tv-live [data-ui='guide-now'] {
+  background: #fff;
+}
