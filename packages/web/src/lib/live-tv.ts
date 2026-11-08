@@ -163,10 +163,13 @@ export function useChannelGroups(): {
       ...(hasFavourites ? [{ id: FAVOURITES, name: t`Favourites` }] : []),
       ...(hasRecents ? [{ id: RECENT, name: t`Recent` }] : []),
       { id: ALL, name: t`All channels` },
-      ...(genres.data?.Items ?? []).map((g) => ({
-        id: g.Id!,
-        name: g.Name ?? '',
-      })),
+      // An addon's own "All channels" group repeats ours.
+      ...(genres.data?.Items ?? [])
+        .filter((g) => !/^all( channels)?$/i.test(g.Name?.trim() ?? ''))
+        .map((g) => ({
+          id: g.Id!,
+          name: g.Name ?? '',
+        })),
     ],
     [hasFavourites, hasRecents, genres.data]
   );
