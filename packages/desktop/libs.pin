@@ -1,9 +1,9 @@
 # The libmpv the desktop app ships: a shinchiro/mpv-winbuild-cmake release and the
 # SHA-256 of each architecture's mpv-dev archive. That repository keeps about four
 # months of releases, so a build that cannot find the tag needs it bumped.
-tag=20260924
-x86_64=50caf10ddb6644da4c205ce67dfe37e32fc3715b33c82e933d6e1962ff61eac9
-aarch64=604fadc84e829019a7ff3c2c1a1f317365f3f170146c3304fc983cdd05551931
+tag=20261109
+x86_64=4e888424015f7146893d03c4d40e2aaf9474d8d47e761bcc6a97489008a7e425
+aarch64=05fd237cdd01caecf8d075eb6a3b90ee64ed6974a0d2d2971ed456e5e002cd1b
 # The LunarG Vulkan Runtime whose vulkan-1.dll the app loads when Windows has none, and
 # the SHA-256 of each architecture's components archive.
 vulkan=1.4.363.0
