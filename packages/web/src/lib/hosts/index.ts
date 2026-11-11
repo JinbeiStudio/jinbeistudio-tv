@@ -107,9 +107,19 @@ export interface Host {
   saveFile?(name: string, type: string, text: string): void;
   /** Replaces what the system's row of what to watch next shows from this app. */
   watchNext?(items: WatchNextItem[]): void;
+  /** Opens a web address outside the page: the device's app for it, else its browser. False when neither could. */
+  openExternal?(url: string): Promise<boolean>;
 }
 
 const browserHost: Host = { name: 'browser' };
+
+/** Leaves the page for a web address, the way the device does it; false when it has no way to. */
+export async function openExternal(url: string): Promise<boolean> {
+  const host = currentHost();
+  if (host.openExternal) return host.openExternal(url);
+  window.open(url, '_blank', 'noopener');
+  return true;
+}
 
 /**
  * Checked on every call, since some apps inject their bridge late or switch

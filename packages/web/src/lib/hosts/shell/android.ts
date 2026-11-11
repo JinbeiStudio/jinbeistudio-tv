@@ -99,6 +99,11 @@ export const saveMpvConfig = (text: string) =>
 export const androidHost: Host = {
   name: 'android-app',
   resolveYouTube,
+  // The web view opens no windows; leaving for another site hands the address to the system instead.
+  openExternal: async (url) => {
+    location.assign(url);
+    return true;
+  },
   get tv() {
     return appBridge()?.tv === true;
   },
