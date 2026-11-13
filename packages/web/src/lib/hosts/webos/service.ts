@@ -1,5 +1,5 @@
 /** Packaged from `packages/smart-tv/webos-service`. */
-const SERVICE = 'luna://io.github.viren070.aiostreams.service/fetch';
+const SERVICE = 'luna://com.jinbeistudio.aiostreams.webos.service/fetch';
 
 interface PalmServiceBridge {
   onservicecallback: ((message: string) => void) | null;

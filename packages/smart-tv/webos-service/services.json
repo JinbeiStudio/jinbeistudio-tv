@@ -1,9 +1,9 @@
 {
-  "id": "io.github.viren070.aiostreams.service",
+  "id": "com.jinbeistudio.aiostreams.webos.service",
   "description": "Fetches byte ranges for the AIOStreams app",
   "services": [
     {
-      "name": "io.github.viren070.aiostreams.service"
+      "name": "com.jinbeistudio.aiostreams.webos.service"
     }
   ]
 }

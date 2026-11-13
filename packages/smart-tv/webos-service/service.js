@@ -7,7 +7,7 @@ const http = require('http');
 const https = require('https');
 const { URL } = require('url');
 
-const service = new Service('io.github.viren070.aiostreams.service');
+const service = new Service('com.jinbeistudio.aiostreams.webos.service');
 
 const MAX_REDIRECTS = 8;
 const TIMEOUT_MS = 20000;
