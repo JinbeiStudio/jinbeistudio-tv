@@ -16,7 +16,7 @@ import {
 } from '@tanstack/react-query';
 import JellyfinWebApp from './app';
 import { clearCategory, persister } from './lib/cache';
-import { followReachable } from './lib/connection';
+import { followReachable } from './lib/jellyfin/connection';
 import { onLanguageSwitch, startI18n } from './lib/i18n';
 import { markTvosStyle } from './lib/tvos-style';
 import { setupTv } from './lib/tv';

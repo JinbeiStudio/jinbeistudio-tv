@@ -7,23 +7,17 @@ import {
   useGenres,
   useItemPages,
   useViews,
-} from '../../lib/queries';
-import { useFeature } from '../../lib/server-info';
+} from '@/lib/jellyfin/queries';
+import { useFeature } from '@/lib/jellyfin/server-info';
 import { lastCatalog, rememberCatalog } from '../../lib/settings';
-import type { BaseItemDto } from '../../lib/types';
+import type { BaseItemDto } from '@/lib/jellyfin/types';
 // The app's own kinds, so a new one there shows here too.
-import { KINDS, kindOf, type Kind } from '../../pages/discover';
+import { KINDS, kindOf, type Kind } from '@/app/discover/page';
 import { navigate, to } from '../../lib/paths';
 import { PosterGrid } from './grid';
 import { Failed, TopBar } from './parts';
 import { catalogTag } from './home';
-import {
-  catalogGroup,
-  catalogName,
-  count,
-  isServiceLibrary,
-  tr,
-} from './i18n';
+import { catalogGroup, catalogName, count, isServiceLibrary, tr } from './i18n';
 
 // The app's own kinds, so a new one there shows here too.
 

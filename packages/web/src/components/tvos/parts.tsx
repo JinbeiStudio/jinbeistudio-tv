@@ -5,23 +5,23 @@ import { createPortal, flushSync } from 'react-dom';
 import { currentHost } from '../../lib/hosts';
 import { easeLayers, GLIDE_LAYERS } from '../../lib/input/glide';
 import { formatLocale } from '../../lib/i18n';
-import { useSession } from '../../lib/session';
-import { useOwnAvatar } from '../../lib/queries';
+import { useSession } from '@/lib/jellyfin/session';
+import { useOwnAvatar } from '@/lib/jellyfin/history';
 import {
   backdropUrl,
   landscapeUrls,
   logoUrl,
   personImageUrl,
   posterUrl,
-} from '../../lib/images';
+} from '@/lib/artwork/urls';
 import { itemSubtitle, itemTitle, progressOf } from '../../lib/format';
 import { itemPath, navigate, to } from '../../lib/paths';
-import type { BaseItemDto, BaseItemPerson } from '../../lib/types';
-import { RowScroller, useNear, watch } from '../../lib/use-in-view';
-import { Artwork } from '../cards';
+import type { BaseItemDto, BaseItemPerson } from '@/lib/jellyfin/types';
+import { RowScroller, useNear, watch } from '@/hooks/use-in-view';
+import { Artwork } from '@/components/media/cards';
 import { CachedImage } from '../cached-image';
-import { Scores, scoresOf } from '../scores';
-import { ItemMenu } from '../item-menu';
+import { Scores, scoresOf } from '@/components/media/scores';
+import { ItemMenu } from '@/components/media/item-menu';
 import {
   ContextMenu,
   ContextMenuContent,

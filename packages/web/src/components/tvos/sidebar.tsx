@@ -15,13 +15,14 @@ import {
   BiTv,
 } from 'react-icons/bi';
 import { formatLocale } from '../../lib/i18n';
-import { useSession } from '../../lib/session';
-import { useLiveTvView, useOwnAvatar } from '../../lib/queries';
+import { useSession } from '@/lib/jellyfin/session';
+import { useLiveTvView } from '@/lib/jellyfin/queries';
+import { useOwnAvatar } from '@/lib/jellyfin/history';
 import { navigate, to } from '../../lib/paths';
 import { downloadsHost } from '../../lib/downloads';
 import { useParty } from '../../lib/party/party';
-import { openPartySheet } from '../party/party-sheet';
-import { openPlaylists } from '../playlists';
+import { openPartySheet } from '@/features/party/sheet-state';
+import { openPlaylists } from '@/features/playlists/playlists';
 import { tr } from './i18n';
 
 interface Section {

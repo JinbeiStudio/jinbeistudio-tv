@@ -10,11 +10,11 @@ import {
   useResume,
   useUpcoming,
   useViews,
-} from '../../lib/queries';
-import { useFeature } from '../../lib/server-info';
-import { autoSources, interleave } from '../../pages/home';
-import { cardShape } from '../../lib/images';
-import { useNear } from '../../lib/use-in-view';
+} from '@/lib/jellyfin/queries';
+import { useFeature } from '@/lib/jellyfin/server-info';
+import { autoSources, interleave } from '@/app/home/page';
+import { cardShape } from '@/lib/artwork/urls';
+import { useNear } from '@/hooks/use-in-view';
 import { usePageShown } from '../../lib/page-shown';
 import { settings, useSetting } from '../../lib/settings';
 import { duration, progressOf, remainingMs, ticksToMs } from '../../lib/format';
@@ -26,9 +26,10 @@ import {
   BiPlay,
   BiSolidHeart,
 } from 'react-icons/bi';
-import { useFetchNextUp, useSetFavorite } from '../../lib/queries';
-import type { BaseItemDto } from '../../lib/types';
-import { useVersionPicker } from '../version-picker';
+import { useFetchNextUp } from '@/lib/jellyfin/queries';
+import { useSetFavorite } from '@/lib/jellyfin/watch-state';
+import type { BaseItemDto } from '@/lib/jellyfin/types';
+import { useVersionPicker } from '@/features/versions/version-picker';
 import {
   Backdrop,
   Logo,

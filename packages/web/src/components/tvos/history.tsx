@@ -1,25 +1,24 @@
 /* eslint-disable lingui/no-unlocalized-strings -- the tvOS style's words go through tr() (./i18n), which this rule doesn't know */
 import React from 'react';
 import { BiHeart, BiMoviePlay, BiTimeFive, BiTv } from 'react-icons/bi';
-import { useInView } from '../../lib/use-in-view';
-import { useSession } from '../../lib/session';
-import { useFeature } from '../../lib/server-info';
+import { useInView } from '@/hooks/use-in-view';
+import { useSession } from '@/lib/jellyfin/session';
+import { useFeature } from '@/lib/jellyfin/server-info';
 import { toast } from 'sonner';
 import { ContextMenuItem } from '@aiostreams/ui/context-menu';
 import {
   useActivity,
-  useClearHistory,
   useHistory,
   useOwnHistory,
   useOwnSessions,
   useOwnTotals,
-  useSetPlayed,
-} from '../../lib/queries';
+} from '@/lib/jellyfin/history';
+import { useClearHistory, useSetPlayed } from '@/lib/jellyfin/watch-state';
 import { clock, itemTitle, ticksToMs } from '../../lib/format';
-import { openRemote } from '../remote-sheet';
-import { ExportButton, ResetButton } from '../../pages/history';
+import { openRemote } from '@/features/remote/remote-sheet';
+import { ExportButton, ResetButton } from '@/app/history/page';
 import { itemPath, navigate } from '../../lib/paths';
-import type { HistoryEntry, SessionInfoDto } from '../../lib/types';
+import type { HistoryEntry, SessionInfoDto } from '@/lib/jellyfin/types';
 import { Failed, Scroller, Spinner, TopBar, WideCard } from './parts';
 import { count, tr } from './i18n';
 

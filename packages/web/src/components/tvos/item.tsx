@@ -20,28 +20,33 @@ import {
   useNextUpFor,
   useItemPages,
   useSeasons,
-  useSetFavorite,
-  useRemoteDevices,
-  useSetDropped,
-  useSetPlayed,
   useShowAhead,
   useSimilar,
-} from '../../lib/queries';
-import { TrailerButton } from '../trailers';
-import { RatingButton } from '../rating';
-import { DownloadButton, ShowDownloadMenu } from '../download-button';
-import { ExternalLinks } from '../external-links';
-import { openRandom } from '../random-pick';
-import { openPartySheet } from '../party/party-sheet';
-import { openRemote } from '../remote-sheet';
-import { openAddToPlaylist } from '../playlists';
+} from '@/lib/jellyfin/queries';
+import {
+  useSetFavorite,
+  useSetDropped,
+  useSetPlayed,
+} from '@/lib/jellyfin/watch-state';
+import { useRemoteDevices } from '@/lib/jellyfin/history';
+import { TrailerButton } from '@/app/item/_components/trailers';
+import { RatingButton } from '@/app/item/_components/rating';
+import {
+  DownloadButton,
+  ShowDownloadMenu,
+} from '@/features/downloads/download-button';
+import { ExternalLinks } from '@/components/media/external-links';
+import { openRandom } from '@/components/media/random-pick';
+import { openPartySheet } from '@/features/party/sheet-state';
+import { openRemote } from '@/features/remote/remote-sheet';
+import { openAddToPlaylist } from '@/features/playlists/playlists';
 import { playable } from '../../lib/playlists';
 import { useParty } from '../../lib/party/party';
-import { useFeature } from '../../lib/server-info';
+import { useFeature } from '@/lib/jellyfin/server-info';
 import { fullTitle } from '../../lib/format';
-import { useSession } from '../../lib/session';
-import { landscapeUrls } from '../../lib/images';
-import { Artwork } from '../cards';
+import { useSession } from '@/lib/jellyfin/session';
+import { landscapeUrls } from '@/lib/artwork/urls';
+import { Artwork } from '@/components/media/cards';
 import { useExternalReturn } from '../../lib/playback/external-return';
 import {
   duration,
@@ -55,15 +60,16 @@ import {
 } from '../../lib/format';
 import { itemPath, navigate, to } from '../../lib/paths';
 import { formatLocale } from '../../lib/i18n';
-import { airsLine, linksFor } from '../../pages/item';
-import type { BaseItemDto } from '../../lib/types';
+import { airsLine } from '@/app/item/_components/details';
+import { linksFor } from '@/app/item/_components/header';
+import type { BaseItemDto } from '@/lib/jellyfin/types';
 import {
   PickOnArrival,
   usePreloadVersions,
   useVersionPicker,
-} from '../version-picker';
-import { ItemMenu } from '../item-menu';
-import { upToIndex } from '../episodes';
+} from '@/features/versions/version-picker';
+import { ItemMenu } from '@/components/media/item-menu';
+import { upToIndex } from '@/components/media/episodes';
 import {
   Backdrop,
   Logo,

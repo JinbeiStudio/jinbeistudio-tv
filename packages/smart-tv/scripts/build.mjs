@@ -87,6 +87,7 @@ if (platform === 'webos') {
   run(process.execPath, [
     join(cli, 'bin/ares-package.js'),
     stage,
+    join(root, 'webos-service'),
     '--outdir',
     fullHd ? join(out, '1080p') : out,
     '--no-minify',

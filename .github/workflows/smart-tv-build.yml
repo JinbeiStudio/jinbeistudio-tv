@@ -45,6 +45,9 @@ jobs:
       - run: pnpm -F @aiostreams/web build:standalone
         env:
           JINBEI_VERSION: ${{ steps.version.outputs.version }}
+          APTABASE_APP_KEY: ${{ vars.APTABASE_APP_KEY }}
+          APTABASE_HOST: ${{ vars.APTABASE_HOST }}
+          APP_VERSION: ${{ steps.version.outputs.version }}
       - uses: actions/upload-artifact@v7
         with:
           name: smart-tv-web

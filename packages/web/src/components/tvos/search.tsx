@@ -14,22 +14,23 @@ import {
   useLiveTvView,
   useSearch,
   useSearchSuggestions,
-} from '../../lib/queries';
-import { airedShare, airingAt, useNow, useSchedules } from '../../lib/live-tv';
-import { posterUrl } from '../../lib/images';
-import { BATCH } from '../channel-list';
-import { CachedImage } from '../cached-image';
-import { ItemMenu } from '../item-menu';
-import { useVersionPicker } from '../version-picker';
-import { useSession } from '../../lib/session';
-import { useSearchHistory } from '../../lib/search-history';
-import { goBack, itemPath, navigate, to } from '../../lib/paths';
-import type { BaseItemDto } from '../../lib/types';
+} from '@/lib/jellyfin/queries';
 import {
-  nameWords,
-  useKeyboardCompletions,
-  useVoice,
-} from '../../pages/search';
+  airedShare,
+  airingAt,
+  useNow,
+  useSchedules,
+} from '@/features/live-tv/live-tv';
+import { posterUrl } from '@/lib/artwork/urls';
+import { BATCH } from '@/features/live-tv/channel-list';
+import { CachedImage } from '../cached-image';
+import { ItemMenu } from '@/components/media/item-menu';
+import { useVersionPicker } from '@/features/versions/version-picker';
+import { useSession } from '@/lib/jellyfin/session';
+import { useSearchHistory } from '@/app/search/search-history';
+import { goBack, itemPath, navigate, to } from '../../lib/paths';
+import type { BaseItemDto } from '@/lib/jellyfin/types';
+import { nameWords, useKeyboardCompletions, useVoice } from '@/app/search/page';
 import { ArtTile, PersonCard, PosterCard, Row, Spinner } from './parts';
 import { tr } from './i18n';
 

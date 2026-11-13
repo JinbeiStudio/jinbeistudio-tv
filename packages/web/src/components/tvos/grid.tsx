@@ -1,7 +1,7 @@
 /* eslint-disable lingui/no-unlocalized-strings -- the tvOS style's words go through tr() (./i18n), which this rule doesn't know */
 import React from 'react';
-import { useInView, watch } from '../../lib/use-in-view';
-import type { BaseItemDto } from '../../lib/types';
+import { useInView, watch } from '@/hooks/use-in-view';
+import type { BaseItemDto } from '@/lib/jellyfin/types';
 import { PosterCard, Spinner } from './parts';
 
 /** Posters in a grid, loading more as the end comes into view. */

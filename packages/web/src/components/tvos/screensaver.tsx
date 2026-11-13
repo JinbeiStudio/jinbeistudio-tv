@@ -1,10 +1,10 @@
 /* eslint-disable lingui/no-unlocalized-strings -- the tvOS style's words go through tr() (./i18n), which this rule doesn't know */
 import React from 'react';
 import { formatLocale } from '../../lib/i18n';
-import { useSession } from '../../lib/session';
-import { useLibraryHeads, useViews } from '../../lib/queries';
-import { backdropUrl, logoUrl } from '../../lib/images';
-import type { BaseItemDto } from '../../lib/types';
+import { useSession } from '@/lib/jellyfin/session';
+import { useLibraryHeads, useViews } from '@/lib/jellyfin/queries';
+import { backdropUrl, logoUrl } from '@/lib/artwork/urls';
+import type { BaseItemDto } from '@/lib/jellyfin/types';
 import { setSaverOn } from './parts';
 
 const IDLE_MS = 3 * 60_000;

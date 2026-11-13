@@ -1,4 +1,4 @@
-import { LiveTvPage } from '../../pages/live-tv';
+import { LiveTvPage } from '@/app/live-tv/page';
 import { TopBar } from './parts';
 
 /**

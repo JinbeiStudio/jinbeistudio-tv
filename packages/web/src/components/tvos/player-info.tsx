@@ -5,10 +5,10 @@ import { BiInfoCircle, BiRevision } from 'react-icons/bi';
 import { useRouterState } from '@tanstack/react-router';
 import { Modal } from '@aiostreams/ui/modal';
 import { runAction } from '../../lib/input';
-import { useItem } from '../../lib/queries';
+import { useItem } from '@/lib/jellyfin/queries';
 import { itemTitle } from '../../lib/format';
 import { navigate, to } from '../../lib/paths';
-import { ControlButton } from '../player/buttons';
+import { ControlButton } from '@/features/player/buttons';
 import { metaLine } from './parts';
 import { tr } from './i18n';
 

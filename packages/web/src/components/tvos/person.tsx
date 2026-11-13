@@ -1,9 +1,9 @@
 /* eslint-disable lingui/no-unlocalized-strings -- the tvOS style's words go through tr() (./i18n), which this rule doesn't know */
 import React from 'react';
-import { useItem, usePersonItems } from '../../lib/queries';
-import { useSession } from '../../lib/session';
-import { posterUrl } from '../../lib/images';
-import { ExternalLinks } from '../external-links';
+import { useItem, usePersonItems } from '@/lib/jellyfin/queries';
+import { useSession } from '@/lib/jellyfin/session';
+import { posterUrl } from '@/lib/artwork/urls';
+import { ExternalLinks } from '@/components/media/external-links';
 import { PosterGrid } from './grid';
 import { Failed, Spinner, TopBar } from './parts';
 import { tr } from './i18n';

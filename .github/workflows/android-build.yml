@@ -42,6 +42,8 @@ jobs:
       - run: pnpm -F @aiostreams/web build:standalone
         env:
           JINBEI_VERSION: ${{ inputs.version }}
+          APTABASE_APP_KEY: ${{ vars.APTABASE_APP_KEY }}
+          APTABASE_HOST: ${{ vars.APTABASE_HOST }}
       - uses: actions/setup-java@v6
         with:
           distribution: temurin

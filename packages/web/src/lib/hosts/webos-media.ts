@@ -1,18 +1,11 @@
 import { ofType, trackLabel } from '../playback/controller';
 import type { EngineTrack } from '../playback/engine';
 import { SUBTITLE_SIZES, type SubtitleStyle } from '../settings';
-import type { SourceInfo } from '../types';
+import type { SourceInfo } from '@/lib/jellyfin/types';
+import '@/lib/hosts/webos/service';
 
-interface ServiceBridge {
-  onservicecallback?: (message: string) => void;
-  call(uri: string, params: string): void;
-  cancel?(): void;
-}
-
+// `window.PalmServiceBridge` is declared by hosts/webos/service.ts.
 declare global {
-  interface Window {
-    PalmServiceBridge?: new () => ServiceBridge;
-  }
   interface HTMLVideoElement {
     /** webOS names each video's pipeline, which the media service is told. */
     mediaId?: string;

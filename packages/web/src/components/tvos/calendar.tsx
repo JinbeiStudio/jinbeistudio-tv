@@ -1,5 +1,5 @@
 /* eslint-disable lingui/no-unlocalized-strings -- the tvOS style's words go through tr() (./i18n), which this rule doesn't know */
-import { CalendarPage } from '../../pages/calendar';
+import { CalendarPage } from '@/app/calendar/page';
 import { TopBar } from './parts';
 
 /**

@@ -1,10 +1,10 @@
 /* eslint-disable lingui/no-unlocalized-strings -- the tvOS style's words go through tr() (./i18n), which this rule doesn't know */
 import React from 'react';
 import { BiDownload, BiListUl } from 'react-icons/bi';
-import { useItemPages } from '../../lib/queries';
+import { useItemPages } from '@/lib/jellyfin/queries';
 import { downloadsHost } from '../../lib/downloads';
 import { navigate, to } from '../../lib/paths';
-import { openPlaylists } from '../playlists';
+import { openPlaylists } from '@/features/playlists/playlists';
 import { PosterGrid } from './grid';
 import { Failed, TopBar } from './parts';
 import { tr } from './i18n';

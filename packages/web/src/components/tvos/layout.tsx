@@ -12,29 +12,29 @@ import { navigate, to } from '../../lib/paths';
 import { toast } from 'sonner';
 import { watchForNewPage } from '../../lib/web-update';
 import { isTextField, runAction, useAction } from '../../lib/input';
-import { useServerEvents } from '../../lib/server-events';
+import { useServerEvents } from '@/features/remote/server-events';
 import { PageShown } from '../../lib/page-shown';
 import { markTvosStyle } from '../../lib/tvos-style';
+import { ConnectionNote } from '@/components/shell/unreachable';
+import { PageScroll } from '@/components/shell/page-scroll';
 import {
-  ConnectionNote,
-  PageScroll,
   PagesWork,
   pageName,
   usePlayerLeaving,
-} from '../layout';
+} from '@/components/shell/layout';
 import { closePlayback, usePlayback } from '../../lib/playback/session';
-import { useSession } from '../../lib/session';
-import { PlayerPage } from '../../pages/player';
-import { ItemMenuHost } from '../item-menu';
-import { PartyHost } from '../party/party-host';
-import { PlaylistsHost } from '../playlists';
-import { RandomPick } from '../random-pick';
-import { RemoteSheet } from '../remote-sheet';
-import { RemoteTarget } from '../remote-target';
-import { ReminderHost } from '../live-reminders';
-import { VersionPickerProvider } from '../version-picker';
-import { WatchNextSync } from '../watch-next';
-import { GlideLayers } from '../glide-layers';
+import { useSession } from '@/lib/jellyfin/session';
+import { PlayerPage } from '@/app/player/page';
+import { ItemMenuHost } from '@/components/media/item-menu';
+import { PartyHost } from '@/features/party/party-host';
+import { PlaylistsHost } from '@/features/playlists/playlists';
+import { RandomPick } from '@/components/media/random-pick';
+import { RemoteSheet } from '@/features/remote/remote-sheet';
+import { RemoteTarget } from '@/features/remote/remote-target';
+import { ReminderHost } from '@/features/live-tv/live-reminders';
+import { VersionPickerProvider } from '@/features/versions/version-picker';
+import { WatchNextSync } from '@/components/shell/watch-next';
+import { GlideLayers } from '@/components/shell/glide-layers';
 import { PinnedTargets } from './parts';
 import { BiChevronLeft, BiChevronRight } from 'react-icons/bi';
 import { MenuOpener, Pinned, Sea } from './parts';
