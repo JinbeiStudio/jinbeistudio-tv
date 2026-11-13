@@ -291,8 +291,6 @@ export function InterfaceSection() {
   const [combineSearch, setCombineSearch] = useSetting(
     settings.interface.combineSearch
   );
-  // The tvOS style lays out posters, episodes and navigation itself, so those options would change nothing.
-  const tvos = useTvosStyle();
   const [posterSize, setPosterSize] = useSetting(settings.interface.posterSize);
   const [posterLines, setPosterLines] = useSetting(
     settings.interface.posterLines
@@ -311,6 +309,8 @@ export function InterfaceSection() {
     settings.interface.blurSpoilers
   );
   const touch = !currentHost().tv && matchMedia('(pointer: coarse)').matches;
+  // The tvOS style lays out posters, episodes, trailers and navigation itself, so those options would change nothing.
+  const tvos = useTvosStyle();
 
   const option = (value: string, label: string) => ({
     value,
@@ -446,6 +446,76 @@ export function InterfaceSection() {
           />
         </SettingsCard>
       )}
+      {!tvos && (
+        <SettingsCard
+          name="trailers"
+          title={t`Trailers`}
+          description={onDevice()}
+        >
+          <Combobox
+            multiple
+            label={t`Play by themselves`}
+            help={t`Once you rest on a title for a moment. In the hero, only one you went to.`}
+            placeholder={t`Nowhere`}
+            emptyMessage={t`Nothing matches.`}
+            options={[
+              ...(touch ? [] : [option('cards', t`Cards`)]),
+              option('hero', t`Hero`),
+              option('item', t`Title pages`),
+            ]}
+            value={TRAILER_SPOTS.filter((spot) => trailers[spot])}
+            onValueChange={(value) =>
+              setTrailers(
+                Object.fromEntries(
+                  TRAILER_SPOTS.map((spot) => [spot, value.includes(spot)])
+                ) as typeof trailers
+              )
+            }
+          />
+          <Switch
+            side="right"
+            label={t`Sound`}
+            help={t`Off, a trailer still plays with sound once you open it whole.`}
+            value={trailerSound}
+            onValueChange={setTrailerSound}
+          />
+        </SettingsCard>
+      )}
+      {!tvos && (
+        <SettingsCard
+          name="episodes"
+          title={t`Episodes`}
+          description={onDevice()}
+        >
+          <Select
+            label={t`Episode layout`}
+            help={t`Automatic lists episodes on narrow screens and puts them in a row on wide ones.`}
+            options={[
+              { value: 'auto', label: t`Automatic` },
+              { value: 'row', label: t`Row` },
+              { value: 'list', label: t`List` },
+            ]}
+            value={episodeLayout}
+            onValueChange={(value) => setEpisodeLayout(value as EpisodeLayout)}
+          />
+        </SettingsCard>
+      )}
+      {!tvos && (
+        <SettingsCard
+          name="spoilers"
+          title={t`Spoilers`}
+          description={followsYou()}
+        >
+          <Switch
+            side="right"
+            label={t`Blur episodes you haven't started`}
+            help={t`Blurs their pictures, titles and descriptions until the pointer, keyboard or remote is on one.`}
+            value={blurSpoilers}
+            onValueChange={setBlurSpoilers}
+          />
+        </SettingsCard>
+      )}
+      {!tvos && <NavigationCard />}
     </>
   );
 }
