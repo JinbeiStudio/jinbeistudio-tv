@@ -34,7 +34,16 @@ export interface AvPlay {
 }
 
 interface Tizen {
-  application: { getCurrentApplication(): { exit(): void } };
+  application: {
+    getCurrentApplication(): { exit(): void };
+    launchAppControl(
+      control: object,
+      appId: string | null,
+      onSuccess?: () => void,
+      onError?: (error: unknown) => void
+    ): void;
+  };
+  ApplicationControl: new (operation: string, uri: string) => object;
   tvinputdevice?: {
     getSupportedKeys(): { name: string }[];
     registerKey(name: string): void;
@@ -97,6 +106,25 @@ export function tizenHost(): Host | null {
     // eslint-disable-next-line lingui/no-unlocalized-strings -- how the server lists the device
     device: () => ({ name: 'Samsung TV' }),
     exit: () => window.tizen?.application.getCurrentApplication().exit(),
+    // The web view can't leave for another site; the TV picks its app for the address (YouTube, else the browser).
+    openExternal: (url) =>
+      new Promise((resolve) => {
+        const tizen = window.tizen;
+        if (!tizen) return resolve(false);
+        try {
+          tizen.application.launchAppControl(
+            new tizen.ApplicationControl(
+              'http://tizen.org/appcontrol/operation/view',
+              url
+            ),
+            null,
+            () => resolve(true),
+            () => resolve(false)
+          );
+        } catch {
+          resolve(false);
+        }
+      }),
     start: registerMediaKeys,
     ...(window.webapis?.avplay && {
       player: avPlayEngine,

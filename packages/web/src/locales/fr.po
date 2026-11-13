@@ -4566,6 +4566,10 @@ msgid "This show has no episodes to pick from yet."
 msgstr "Cette série n'a pas encore d'épisodes disponibles."
 
 #: src/pages/trailer.tsx
+msgid "This device has no app to open it."
+msgstr "Cet appareil n'a pas d'application pour l'ouvrir."
+
+#: src/pages/trailer.tsx
 msgid "This trailer can't play in the app."
 msgstr "Cette bande-annonce ne peut pas être lue dans l'application."
 

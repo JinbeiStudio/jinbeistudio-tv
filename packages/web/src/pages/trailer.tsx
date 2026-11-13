@@ -1,13 +1,14 @@
 import { t } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import React from 'react';
+import { toast } from 'sonner';
 import { BiArrowBack, BiLinkExternal } from 'react-icons/bi';
 import { LuArrowLeft, LuSkipBack, LuSkipForward } from 'react-icons/lu';
 import { Button, IconButton } from '@aiostreams/ui/button';
 import { cn } from '@aiostreams/ui/core/styling';
 import { useSession } from '../lib/session';
 import { useItem } from '../lib/queries';
-import { currentHost } from '../lib/hosts';
+import { currentHost, openExternal } from '../lib/hosts';
 import { usePlayerFullscreen } from '../lib/playback/fullscreen';
 import { usePlayer } from '../lib/playback/use-player';
 import { videoEngine } from '../lib/playback/video';
@@ -274,7 +275,12 @@ function TrailerFailure({
               className="rounded-full"
               leftIcon={<BiLinkExternal />}
               autoFocus
-              onClick={() => window.open(external, '_blank', 'noopener')}
+              onClick={() =>
+                void openExternal(external).then((opened) => {
+                  if (!opened)
+                    toast.error(t`This device has no app to open it.`);
+                })
+              }
             >
               <Trans>Open its page</Trans>
             </Button>

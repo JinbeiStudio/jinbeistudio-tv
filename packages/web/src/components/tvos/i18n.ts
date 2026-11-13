@@ -264,6 +264,9 @@ const IDS: Record<string, string> = {
   'recommendations.movies': 'for-you',
   'recommendations.series': 'for-you',
   'recommendations.anime': 'for-you',
+  'custom.com_jinbeistudio_foryou.movie.movies': 'for-you',
+  'custom.com_jinbeistudio_foryou.series.series': 'for-you',
+  'custom.com_jinbeistudio_foryou.anime.anime': 'for-you',
 };
 
 interface CatalogView {
@@ -283,9 +286,13 @@ function catalogIds(view: CatalogView): string[] {
   return [found[1], found[1].replace(/_(?:movie|series|anime)$/, '')];
 }
 
-/** AIOMetadata's "For you" rows, whose synopses start with the model's reason for the pick. */
+/** The "For you" rows: AIOMetadata's own, or ours picked by Claude (custom catalogs from the for-you addon). */
 export function isForYouCatalog(view: CatalogView): boolean {
-  return catalogIds(view).some((id) => id.startsWith('recommendations.'));
+  return catalogIds(view).some(
+    (id) =>
+      id.startsWith('recommendations.') ||
+      id.startsWith('custom.com_jinbeistudio_foryou.')
+  );
 }
 
 /** Whether the server says this catalog is anime, by its path or its id, whatever it is called. */
