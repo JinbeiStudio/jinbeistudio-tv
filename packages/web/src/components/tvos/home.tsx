@@ -120,6 +120,9 @@ function useCatalogs() {
   };
 }
 
+/** How long the hero's first title sits untouched before its trailer plays. */
+const FIRST_REST_MS = 4000;
+
 /** The hero and its artwork, apart from the rows and memoised, so its turning and the page's scrolling don't redraw each other. */
 const Hero = React.memo(function Hero({
   lowered,
@@ -193,11 +196,12 @@ const Hero = React.memo(function Hero({
     return () => window.clearInterval(timer);
   }, [heroFocused, lowered, shown, saverOn, hero.length, heroSeconds]);
   const current = hero[index % Math.max(hero.length, 1)];
-  // As the app's hero: only a title the user went to plays its trailer, once it rests with the focus on it.
+  // The title's trailer once it rests with the focus on it; the one the page opened on waits longer, untouched.
   const [chosen, setChosen] = React.useState(false);
   const trailer = useTvosTrailer(
-    chosen && heroFocused && !lowered && shown ? current : null,
-    'hero'
+    heroFocused && !lowered && shown ? current : null,
+    'hero',
+    chosen ? {} : { restMs: FIRST_REST_MS, untouched: true }
   );
 
   return (
