@@ -56,6 +56,8 @@ const FR: Record<string, string> = {
   Versions: 'Versions',
   Details: 'Détails',
   Next: 'Suivant',
+  Trailer: 'Bande-annonce',
+  'Stop trailer': 'Arrêter la bande-annonce',
   'Add to favourites': 'Ajouter aux favoris',
   'Remove from favourites': 'Retirer des favoris',
   Favourite: 'Favori',

@@ -113,6 +113,11 @@ function probe(): Probe {
 /** Whether trailers may start by themselves in `spot` here and now. */
 export function useTrailersOn(spot: TrailerSpot): boolean {
   const [on] = useSetting(settings.interface.trailer[spot]);
+  return useTrailersCan() && on;
+}
+
+/** Whether a trailer can play in a box of the page here and now, asked for or not. */
+export function useTrailersCan(): boolean {
   const shown = usePageShown();
   const playback = usePlayback();
   const party = useParty();
@@ -122,7 +127,6 @@ export function useTrailersOn(spot: TrailerSpot): boolean {
     visibility.get
   );
   return (
-    on &&
     shown &&
     visible &&
     !playback &&
@@ -283,6 +287,8 @@ export interface TrailerPreviewProps {
   over?: boolean;
   /** Over the whole window with the player's controls, with sound. */
   full?: boolean;
+  /** With sound whatever the setting, as one asked for. */
+  sound?: boolean;
   /** Fades out at its bottom and start into a background taken from artwork. */
   soft?: boolean;
   /** Whether the picture shows, so what covers it can fade. */
@@ -308,7 +314,7 @@ export function TrailerPreview(props: TrailerPreviewProps) {
   const trailer = trailers[at];
   const playback = useTrailerPlayback(trailer?.url);
   const [sound] = useSetting(settings.interface.trailerSound);
-  const muted = !full && !sound;
+  const muted = !full && !(props.sound ?? sound);
   const ended = useLatest(props.onEnded);
   useOnlyOne(() => ended.current('stopped'));
   const box = useSpotBox(spot, () => !full && ended.current('stopped'));

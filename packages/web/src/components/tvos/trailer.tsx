@@ -2,7 +2,11 @@ import React from 'react';
 import type { BaseItemDto } from '@/lib/jellyfin/types';
 import type { TrailerSpot } from '@/lib/settings';
 import { useLatest } from '@/hooks/use-latest';
-import { TrailerPreview, useTrailersOn } from '@/features/trailers/preview';
+import {
+  TrailerPreview,
+  useTrailersCan,
+  useTrailersOn,
+} from '@/features/trailers/preview';
 import { Pinned } from './parts';
 
 /** How long a title rests before its trailer starts, as in the app's hero. */
@@ -31,6 +35,7 @@ const LISTEN = { capture: true, passive: true };
  * The trailer of `item` over the whole window, beneath the page and in place of
  * its artwork, once the title has rested there (`untouched`: with no key
  * pressed meanwhile); null stops it. One that ended waits for another title.
+ * `start` plays it at once with sound, even where trailers don't start by themselves.
  */
 export function useTvosTrailer(
   item: BaseItemDto | null | undefined,
@@ -38,8 +43,11 @@ export function useTvosTrailer(
   { restMs = REST_MS, untouched = false } = {}
 ) {
   const on = useTrailersOn(spot);
+  const can = useTrailersCan();
   const [playing, setPlaying] = React.useState<BaseItemDto | null>(null);
   const [ended, setEnded] = React.useState(false);
+  // Started by hand: with sound, and whether or not trailers start by themselves.
+  const [asked, setAsked] = React.useState(false);
   const [shown, setShown] = React.useState(false);
   const [box, setBox] = React.useState<HTMLDivElement | null>(null);
   const [frame, setFrame] = React.useState<HTMLDivElement | null>(null);
@@ -49,9 +57,13 @@ export function useTvosTrailer(
   React.useEffect(() => {
     setPlaying(null);
     setEnded(false);
-  }, [id, on]);
+    setAsked(false);
+  }, [id]);
   React.useEffect(() => {
-    if (!id || !on || ended || playingId === id) return;
+    if (!can || (!on && !asked)) setPlaying(null);
+  }, [can, on, asked]);
+  React.useEffect(() => {
+    if (!id || !on || ended || asked || playingId === id) return;
     let timer: ReturnType<typeof setTimeout>;
     const wait = () => {
       clearTimeout(timer);
@@ -64,10 +76,20 @@ export function useTvosTrailer(
       clearTimeout(timer);
       for (const name of inputs) removeEventListener(name, wait, LISTEN);
     };
-  }, [id, on, ended, playingId, restMs, untouched, latest]);
+  }, [id, on, ended, asked, playingId, restMs, untouched, latest]);
   React.useEffect(() => {
     if (!playing) setShown(false);
   }, [playing]);
+  const start = React.useCallback(() => {
+    if (!latest.current) return;
+    setAsked(true);
+    setEnded(false);
+    setPlaying(latest.current);
+  }, [latest]);
+  const stop = React.useCallback(() => {
+    setPlaying(null);
+    setEnded(true);
+  }, []);
   useShowingMark(shown);
 
   const preview = playing && (
@@ -82,14 +104,12 @@ export function useTvosTrailer(
           item={playing}
           spot={box}
           within={frame}
+          sound={asked || undefined}
           onShown={setShown}
-          onEnded={() => {
-            setPlaying(null);
-            setEnded(true);
-          }}
+          onEnded={stop}
         />
       )}
     </Pinned>
   );
-  return { preview, shown };
+  return { preview, shown, playing: !!playing, can, start, stop };
 }

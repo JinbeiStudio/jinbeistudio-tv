@@ -24,10 +24,13 @@ import {
   BiChevronRight,
   BiHeart,
   BiInfoCircle,
+  BiMoviePlay,
   BiPlay,
   BiSolidHeart,
+  BiStop,
 } from 'react-icons/bi';
-import { useFetchNextUp } from '@/lib/jellyfin/queries';
+import { useFetchNextUp, useItem } from '@/lib/jellyfin/queries';
+import { trailersOf } from '@/lib/playback/trailers';
 import { useSetFavorite } from '@/lib/jellyfin/watch-state';
 import type { BaseItemDto } from '@/lib/jellyfin/types';
 import { useVersionPicker } from '@/features/versions/version-picker';
@@ -250,6 +253,7 @@ const Hero = React.memo(function Hero({
             )}
             <HeroButtons
               item={current}
+              trailer={trailer}
               onNext={() => {
                 setChosen(true);
                 setIndex((i) => (i + 1) % Math.max(hero.length, 1));
@@ -421,11 +425,16 @@ function CatalogRow({ view, first }: { view: BaseItemDto; first: boolean }) {
  */
 function HeroButtons({
   item,
+  trailer,
   onNext,
 }: {
   item: BaseItemDto;
+  trailer: ReturnType<typeof useTvosTrailer>;
   onNext: () => void;
 }) {
+  // The hero's list leaves trailers out; the title's own details have them.
+  const details = useItem(item.Id ?? '');
+  const hasTrailer = trailersOf(details.data ?? item).length > 0;
   const picker = useVersionPicker();
   const fetchNextUp = useFetchNextUp();
   const setFavorite = useSetFavorite();
@@ -448,6 +457,17 @@ function HeroButtons({
       >
         <BiPlay /> {tr('Play')}
       </button>
+      {trailer.can && hasTrailer && (
+        <button
+          type="button"
+          className="tv-glass tv-button round"
+          aria-label={tr(trailer.playing ? 'Stop trailer' : 'Trailer')}
+          data-label={tr(trailer.playing ? 'Stop trailer' : 'Trailer')}
+          onClick={trailer.playing ? trailer.stop : trailer.start}
+        >
+          {trailer.playing ? <BiStop /> : <BiMoviePlay />}
+        </button>
+      )}
       <button
         type="button"
         className="tv-glass tv-button round"
