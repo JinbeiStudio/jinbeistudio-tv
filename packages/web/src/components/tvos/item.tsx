@@ -87,6 +87,7 @@ import {
   Scroller,
 } from './parts';
 import { tr } from './i18n';
+import { useTvosTrailer } from './trailer';
 
 /**
  * A title's page as the Apple TV app lays it out: the artwork full screen with
@@ -479,6 +480,9 @@ export function TvosItem({
  * The page's artwork, lowered to the sea (as on home) as focus or scrolling goes below
  * the hero: kept apart so that change redraws only the artwork, not every episode.
  */
+/** How long the title page sits untouched before its trailer plays, as the app's. */
+const ITEM_REST_MS = 4000;
+
 function ItemBackdrop({
   lowerRef,
   ...props
@@ -487,7 +491,19 @@ function ItemBackdrop({
 }) {
   const focused = useFocusInside(lowerRef);
   const scrolled = useScrolledDown();
-  return <Backdrop {...props} lowered={focused || scrolled} ambient />;
+  const lowered = focused || scrolled;
+  // As the app's title page: the trailer once the page sits untouched at its top.
+  const trailer = useTvosTrailer(
+    !lowered && !props.waiting ? props.item : null,
+    'item',
+    { restMs: ITEM_REST_MS, untouched: true }
+  );
+  return (
+    <>
+      <Backdrop {...props} lowered={lowered} ambient />
+      {trailer.preview}
+    </>
+  );
 }
 
 /** Asked for only once scrolled near, as the app's page does. */

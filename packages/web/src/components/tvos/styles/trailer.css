@@ -1,0 +1,33 @@
+/* A trailer playing beneath the page (trailer.tsx): its box over the whole window, and nothing opaque left between it and the page. */
+.tv-trailer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+.tv-trailer > [data-ui='tv-trailer'] {
+  position: absolute;
+  inset-block: 0;
+  left: -16.67%;
+  width: 133.33%;
+}
+html[data-tvos-build] .tv-sea-layer {
+  transition: opacity 0.5s ease;
+}
+html[data-tvos-build][data-trailer] .tv-sea-layer {
+  opacity: 0;
+}
+/* The artwork gives way, its shade stays for the text over the video. */
+html[data-tvos-build][data-trailer] .tv-backdrop > * {
+  opacity: 0 !important;
+  transition: opacity 0.5s ease !important;
+}
+/* On TVs, glass over moving video is blurred again every frame. */
+html[data-tvos-build][data-tv][data-trailer]
+  :is(
+    .tv-glass,
+    [data-ui='item-action'],
+    .tv-app-action .UI-Button__root,
+    .tv-dots
+  ) {
+  backdrop-filter: none !important;
+}

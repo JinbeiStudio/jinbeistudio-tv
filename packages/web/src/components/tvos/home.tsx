@@ -15,6 +15,7 @@ import { useFeature } from '@/lib/jellyfin/server-info';
 import { autoSources, interleave } from '@/app/home/page';
 import { cardShape } from '@/lib/artwork/urls';
 import { useNear } from '@/hooks/use-in-view';
+import { useTvosTrailer } from './trailer';
 import { usePageShown } from '../../lib/page-shown';
 import { settings, useSetting } from '../../lib/settings';
 import { duration, progressOf, remainingMs, ticksToMs } from '../../lib/format';
@@ -192,12 +193,19 @@ const Hero = React.memo(function Hero({
     return () => window.clearInterval(timer);
   }, [heroFocused, lowered, shown, saverOn, hero.length, heroSeconds]);
   const current = hero[index % Math.max(hero.length, 1)];
+  // As the app's hero: only a title the user went to plays its trailer, once it rests with the focus on it.
+  const [chosen, setChosen] = React.useState(false);
+  const trailer = useTvosTrailer(
+    chosen && heroFocused && !lowered && shown ? current : null,
+    'hero'
+  );
 
   return (
     <>
       {shown && (
         <Backdrop item={followed ?? current} lowered={lowered} ambient />
       )}
+      {trailer.preview}
       <div ref={heroRef} className="tv-hero">
         {!current && (views.isLoading || heads.some((h) => h.isLoading)) && (
           <Spinner />
@@ -216,7 +224,10 @@ const Hero = React.memo(function Hero({
             )}
             <HeroButtons
               item={current}
-              onNext={() => setIndex((i) => (i + 1) % Math.max(hero.length, 1))}
+              onNext={() => {
+                setChosen(true);
+                setIndex((i) => (i + 1) % Math.max(hero.length, 1));
+              }}
             />
           </>
         )}

@@ -309,7 +309,7 @@ export function InterfaceSection() {
     settings.interface.blurSpoilers
   );
   const touch = !currentHost().tv && matchMedia('(pointer: coarse)').matches;
-  // The tvOS style lays out posters, episodes, trailers and navigation itself, so those options would change nothing.
+  // The tvOS style lays out posters, episodes, card trailers and navigation itself, so those options would change nothing.
   const tvos = useTvosStyle();
 
   const option = (value: string, label: string) => ({
@@ -446,41 +446,39 @@ export function InterfaceSection() {
           />
         </SettingsCard>
       )}
-      {!tvos && (
-        <SettingsCard
-          name="trailers"
-          title={t`Trailers`}
-          description={onDevice()}
-        >
-          <Combobox
-            multiple
-            label={t`Play by themselves`}
-            help={t`Once you rest on a title for a moment. In the hero, only one you went to.`}
-            placeholder={t`Nowhere`}
-            emptyMessage={t`Nothing matches.`}
-            options={[
-              ...(touch ? [] : [option('cards', t`Cards`)]),
-              option('hero', t`Hero`),
-              option('item', t`Title pages`),
-            ]}
-            value={TRAILER_SPOTS.filter((spot) => trailers[spot])}
-            onValueChange={(value) =>
-              setTrailers(
-                Object.fromEntries(
-                  TRAILER_SPOTS.map((spot) => [spot, value.includes(spot)])
-                ) as typeof trailers
-              )
-            }
-          />
-          <Switch
-            side="right"
-            label={t`Sound`}
-            help={t`Off, a trailer still plays with sound once you open it whole.`}
-            value={trailerSound}
-            onValueChange={setTrailerSound}
-          />
-        </SettingsCard>
-      )}
+      <SettingsCard
+        name="trailers"
+        title={t`Trailers`}
+        description={onDevice()}
+      >
+        <Combobox
+          multiple
+          label={t`Play by themselves`}
+          help={t`Once you rest on a title for a moment. In the hero, only one you went to.`}
+          placeholder={t`Nowhere`}
+          emptyMessage={t`Nothing matches.`}
+          options={[
+            ...(touch || tvos ? [] : [option('cards', t`Cards`)]),
+            option('hero', t`Hero`),
+            option('item', t`Title pages`),
+          ]}
+          value={TRAILER_SPOTS.filter((spot) => trailers[spot])}
+          onValueChange={(value) =>
+            setTrailers(
+              Object.fromEntries(
+                TRAILER_SPOTS.map((spot) => [spot, value.includes(spot)])
+              ) as typeof trailers
+            )
+          }
+        />
+        <Switch
+          side="right"
+          label={t`Sound`}
+          help={t`Off, a trailer still plays with sound once you open it whole.`}
+          value={trailerSound}
+          onValueChange={setTrailerSound}
+        />
+      </SettingsCard>
       {!tvos && (
         <SettingsCard
           name="episodes"
