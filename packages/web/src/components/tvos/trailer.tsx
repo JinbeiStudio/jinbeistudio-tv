@@ -31,6 +31,8 @@ function useShowingMark(shown: boolean) {
 /** What a page's buttons need of a trailer. */
 export interface TvosTrailer {
   playing: boolean;
+  /** Asked for or started, its picture not there yet. */
+  loading: boolean;
   can: boolean;
   start(): void;
   stop(): void;
@@ -119,5 +121,13 @@ export function useTvosTrailer(
       )}
     </Pinned>
   );
-  return { preview, shown, playing: !!playing, can, start, stop };
+  return {
+    preview,
+    shown,
+    playing: !!playing,
+    loading: !!playing && !shown,
+    can,
+    start,
+    stop,
+  };
 }

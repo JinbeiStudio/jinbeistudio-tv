@@ -7,6 +7,7 @@ import {
   BiHeart,
   BiListPlus,
   BiListUl,
+  BiLoaderAlt,
   BiMoviePlay,
   BiPlay,
   BiRevision,
@@ -303,7 +304,13 @@ export function TvosItem({
                     label={trailer.playing ? 'Stop trailer' : 'Trailer'}
                     onClick={trailer.playing ? trailer.stop : trailer.start}
                   >
-                    {trailer.playing ? <BiStop /> : <BiMoviePlay />}
+                    {trailer.loading ? (
+                      <BiLoaderAlt className="tv-spin" />
+                    ) : trailer.playing ? (
+                      <BiStop />
+                    ) : (
+                      <BiMoviePlay />
+                    )}
                   </RoundAction>
                 )}
                 {!boxset && (
@@ -514,10 +521,10 @@ function ItemBackdrop({
     'item',
     { restMs: ITEM_REST_MS, untouched: true }
   );
-  const { playing, can, start, stop } = trailer;
+  const { playing, loading, can, start, stop } = trailer;
   React.useEffect(
-    () => onTrailer({ playing, can, start, stop }),
-    [onTrailer, playing, can, start, stop]
+    () => onTrailer({ playing, loading, can, start, stop }),
+    [onTrailer, playing, loading, can, start, stop]
   );
   return (
     <>

@@ -24,6 +24,7 @@ import {
   BiChevronRight,
   BiHeart,
   BiInfoCircle,
+  BiLoaderAlt,
   BiMoviePlay,
   BiPlay,
   BiSolidHeart,
@@ -465,7 +466,13 @@ function HeroButtons({
           data-label={tr(trailer.playing ? 'Stop trailer' : 'Trailer')}
           onClick={trailer.playing ? trailer.stop : trailer.start}
         >
-          {trailer.playing ? <BiStop /> : <BiMoviePlay />}
+          {trailer.loading ? (
+            <BiLoaderAlt className="tv-spin" />
+          ) : trailer.playing ? (
+            <BiStop />
+          ) : (
+            <BiMoviePlay />
+          )}
         </button>
       )}
       <button

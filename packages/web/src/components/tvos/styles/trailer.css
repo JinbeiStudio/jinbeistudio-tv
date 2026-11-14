@@ -35,3 +35,12 @@ html[data-tvos-build][data-tv][data-trailer]
 html[data-tvos-build] [data-ui='trailer-preview-video'] {
   max-width: none;
 }
+/* The Trailer button while its trailer loads. */
+.tv-spin {
+  animation: tv-spin 0.9s linear infinite;
+}
+@keyframes tv-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
