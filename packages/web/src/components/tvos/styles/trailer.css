@@ -31,3 +31,7 @@ html[data-tvos-build][data-tv][data-trailer]
   ) {
   backdrop-filter: none !important;
 }
+/* The page's own `video { max-width: 100% }` would squeeze a trailer drawn wider than the window to one side. */
+html[data-tvos-build] [data-ui='trailer-preview-video'] {
+  max-width: none;
+}

@@ -48,7 +48,8 @@ async function openHls(
   el: HTMLVideoElement,
   file: EngineFile,
   current: () => boolean,
-  failed: (error: string) => void
+  failed: (error: string) => void,
+  quick = false
 ): Promise<{ destroy(): void } | null> {
   const { default: Hls } = await import('hls.js/light');
   if (!current()) return null;
@@ -58,6 +59,8 @@ async function openHls(
   }
   const hls = new Hls({
     startPosition: file.source.IsInfiniteStream ? -1 : file.startMs / 1000,
+    // A short trailer would be over before the default guess climbed past its lowest picture.
+    ...(quick && { abrEwmaDefaultEstimate: 5_000_000 }),
   });
   hls.on(Hls.Events.ERROR, (_, data) => {
     if (data.fatal)
@@ -438,14 +441,19 @@ export function videoEngine(
         onFullscreen();
         el.autoplay = !next.paused;
         if (next.paused) set({ paused: true });
-        if (linkType(next.url) === HLS && !el.canPlayType(HLS))
+        // webOS's own HLS player keeps a YouTube trailer on its lowest, 144p, variant.
+        const trailerOnTv =
+          !!window.PalmServiceBridge &&
+          !!next.source.Id?.startsWith('trailer:');
+        if (linkType(next.url) === HLS && (!el.canPlayType(HLS) || trailerOnTv))
           void openHls(
             el,
             next,
             () => file === next,
             // One that never loaded, as from a site without CORS, is the link's fault.
             (error) =>
-              emit({ type: 'failed', error, unsupported: !el.readyState })
+              emit({ type: 'failed', error, unsupported: !el.readyState }),
+            trailerOnTv
           ).then((opened) => {
             if (file === next) hls = opened;
             else opened?.destroy();
