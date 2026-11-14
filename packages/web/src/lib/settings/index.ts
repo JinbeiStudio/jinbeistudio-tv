@@ -86,8 +86,8 @@ export type TopBar = (typeof TOP_BARS)[number];
 export const TAB_NAMES = ['shown', 'hidden'] as const;
 export type TabNames = (typeof TAB_NAMES)[number];
 
-export const BAR_BACKGROUNDS = ['solid', 'frosted', 'liquid'] as const;
-export type BarBackground = (typeof BAR_BACKGROUNDS)[number];
+export const GLASS_SURFACES = ['solid', 'frosted', 'liquid'] as const;
+export type GlassSurface = (typeof GLASS_SURFACES)[number];
 
 const POSTER_LINES: PosterLine[] = ['title', 'year'];
 
@@ -476,13 +476,6 @@ export const settings = {
       'shown',
       TAB_NAMES
     ),
-    /** What the navigation bars over the page sit on. */
-    barBackground: device<BarBackground>(
-      'aiostreams-web-interface-bar-background',
-      'frosted',
-      BAR_BACKGROUNDS,
-      ['aiostreams-web-bar-background']
-    ),
   },
   theme: {
     /** Unset colours keep the stylesheet's own. */
@@ -502,6 +495,18 @@ export const settings = {
       'tvos',
       INTERFACE_STYLES
     ),
+    /** What the navigation bars and glass panels sit on. */
+    glassSurface: device<GlassSurface>(
+      'aiostreams-web-theme-glass-surface',
+      'frosted',
+      GLASS_SURFACES,
+      [
+        'aiostreams-web-interface-bar-background',
+        'aiostreams-web-bar-background',
+      ]
+    ),
+    artBackground: syncedFlag('artBackground'),
+    artGlass: device<boolean>('aiostreams-web-theme-art-glass', false),
   },
   playback: {
     autoPlayFirst: syncedFlag('autoPlayFirst', true, [
