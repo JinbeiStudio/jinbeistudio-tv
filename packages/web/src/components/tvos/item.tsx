@@ -7,10 +7,12 @@ import {
   BiHeart,
   BiListPlus,
   BiListUl,
+  BiMoviePlay,
   BiPlay,
   BiRevision,
   BiShuffle,
   BiSolidHeart,
+  BiStop,
   BiX,
 } from 'react-icons/bi';
 import {
@@ -87,7 +89,8 @@ import {
   Scroller,
 } from './parts';
 import { tr } from './i18n';
-import { useTvosTrailer } from './trailer';
+import { useTvosTrailer, type TvosTrailer } from './trailer';
+import { trailersOf } from '@/lib/playback/trailers';
 
 /**
  * A title's page as the Apple TV app lays it out: the artwork full screen with
@@ -203,6 +206,8 @@ export function TvosItem({
       );
   }, [openingEpisode, episodes]);
 
+  // Told by the backdrop, which keeps its own focus watching so the page doesn't redraw with it.
+  const [trailer, setTrailer] = React.useState<TvosTrailer>();
   // The Play button starts focused, as on tvOS.
   const playRef = React.useRef<HTMLButtonElement>(null);
   React.useEffect(() => {
@@ -226,6 +231,7 @@ export function TvosItem({
         lowerRef={lowerRef}
         waiting={!ready}
         onReady={onArtReady}
+        onTrailer={setTrailer}
       />
       {!ready && (
         <Pinned>
@@ -292,6 +298,14 @@ export function TvosItem({
                 <span className="tv-app-action">
                   <TrailerButton item={item} />
                 </span>
+                {trailer?.can && trailersOf(item).length > 0 && (
+                  <RoundAction
+                    label={trailer.playing ? 'Stop trailer' : 'Trailer'}
+                    onClick={trailer.playing ? trailer.stop : trailer.start}
+                  >
+                    {trailer.playing ? <BiStop /> : <BiMoviePlay />}
+                  </RoundAction>
+                )}
                 {!boxset && (
                   <button
                     type="button"
@@ -485,9 +499,11 @@ const ITEM_REST_MS = 4000;
 
 function ItemBackdrop({
   lowerRef,
+  onTrailer,
   ...props
 }: Omit<React.ComponentProps<typeof Backdrop>, 'lowered'> & {
   lowerRef: React.RefObject<HTMLElement | null>;
+  onTrailer: (trailer: TvosTrailer) => void;
 }) {
   const focused = useFocusInside(lowerRef);
   const scrolled = useScrolledDown();
@@ -497,6 +513,11 @@ function ItemBackdrop({
     !lowered && !props.waiting ? props.item : null,
     'item',
     { restMs: ITEM_REST_MS, untouched: true }
+  );
+  const { playing, can, start, stop } = trailer;
+  React.useEffect(
+    () => onTrailer({ playing, can, start, stop }),
+    [onTrailer, playing, can, start, stop]
   );
   return (
     <>

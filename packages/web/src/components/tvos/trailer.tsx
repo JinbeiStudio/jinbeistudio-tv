@@ -28,6 +28,14 @@ function useShowingMark(shown: boolean) {
   }, [shown]);
 }
 
+/** What a page's buttons need of a trailer. */
+export interface TvosTrailer {
+  playing: boolean;
+  can: boolean;
+  start(): void;
+  stop(): void;
+}
+
 const INPUT = ['keydown', 'pointerdown', 'wheel', 'touchstart'] as const;
 const LISTEN = { capture: true, passive: true };
 
