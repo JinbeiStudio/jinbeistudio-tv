@@ -67,10 +67,15 @@
         height: 100%;
         animation: splash-breathe 2.4s ease-in-out infinite;
       }
-      .splash-breath svg {
+      /* Jinbei Studio's logo, at the size the TV's launch cover gives it. */
+      .splash-breath {
+        display: grid;
+        place-items: center;
+      }
+      .splash-breath img {
         display: block;
-        width: 100%;
-        height: 100%;
+        width: 56%;
+        height: auto;
       }
       @keyframes splash-breathe {
         50% {
@@ -105,20 +110,11 @@
   </head>
   <body>
     <% if (splash) { %>
-    <!-- Matches the Android app's res/drawable/splash_logo.xml. -->
+    <!-- Matches the Android app's res/drawable/splash_logo.xml: Jinbei Studio's logo. -->
     <div id="splash" aria-hidden="true">
       <div class="splash-logo">
         <div class="splash-breath">
-          <svg viewBox="0 0 1080 1080">
-            <path
-              fill="#fff"
-              d="M508.34,338.5h3.14c65.24,0,106.01,70.62,73.39,127.12l-160.44,277.88h0c-66.63,0-108.27,-72.13 -74.96,-129.83l158.87,-275.17Z"
-            />
-            <path
-              fill="#fff"
-              d="M547.53,644.5a97.36,99 0,1 0,194.72 0a97.36,99 0,1 0,-194.72 0Z"
-            />
-          </svg>
+          <img src="<%= root %>jinbei-logo.png" alt="" />
         </div>
       </div>
     </div>
