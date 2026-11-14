@@ -120,6 +120,25 @@ function useCatalogs() {
   };
 }
 
+/** Whether a mouse rests over the element. */
+function useMouseOver(ref: React.RefObject<HTMLElement | null>) {
+  const [over, setOver] = React.useState(false);
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const enter = (e: PointerEvent) =>
+      e.pointerType === 'mouse' && setOver(true);
+    const leave = () => setOver(false);
+    el.addEventListener('pointerenter', enter);
+    el.addEventListener('pointerleave', leave);
+    return () => {
+      el.removeEventListener('pointerenter', enter);
+      el.removeEventListener('pointerleave', leave);
+    };
+  }, [ref]);
+  return over;
+}
+
 /** How long the hero's first title sits untouched before its trailer plays. */
 const FIRST_REST_MS = 4000;
 
@@ -185,21 +204,24 @@ const Hero = React.memo(function Hero({
   const [index, setIndex] = React.useState(0);
   const [heroSeconds] = useSetting(settings.interface.heroSeconds);
   const [heroRef, heroFocused] = useFocusWithin<HTMLDivElement>();
+  // Safari's engine (the Mac app) doesn't focus a clicked button, so a mouse resting on the hero holds it too.
+  const heroHovered = useMouseOver(heroRef);
+  const held = heroFocused || heroHovered;
   const saverOn = useSaverOn();
   // The hero moves on by itself until it is focused, and not while down in the rows.
   React.useEffect(() => {
-    if (heroFocused || lowered || !shown || saverOn || hero.length < 2) return;
+    if (held || lowered || !shown || saverOn || hero.length < 2) return;
     const timer = window.setInterval(
       () => setIndex((i) => (i + 1) % hero.length),
       heroSeconds * 1000
     );
     return () => window.clearInterval(timer);
-  }, [heroFocused, lowered, shown, saverOn, hero.length, heroSeconds]);
+  }, [held, lowered, shown, saverOn, hero.length, heroSeconds]);
   const current = hero[index % Math.max(hero.length, 1)];
   // The title's trailer once it rests with the focus on it; the one the page opened on waits longer, untouched.
   const [chosen, setChosen] = React.useState(false);
   const trailer = useTvosTrailer(
-    heroFocused && !lowered && shown ? current : null,
+    held && !lowered && shown ? current : null,
     'hero',
     chosen ? {} : { restMs: FIRST_REST_MS, untouched: true }
   );
