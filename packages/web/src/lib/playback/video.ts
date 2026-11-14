@@ -51,7 +51,10 @@ async function openHls(
   failed: (error: string) => void,
   quick = false
 ): Promise<{ destroy(): void } | null> {
-  const { default: Hls } = await import('hls.js/light');
+  // YouTube's trailers carry their sound as a separate track, which the light build drops.
+  const { default: Hls } = await (quick
+    ? import('hls.js')
+    : import('hls.js/light'));
   if (!current()) return null;
   if (!Hls.isSupported()) {
     failed(browserCannot());
