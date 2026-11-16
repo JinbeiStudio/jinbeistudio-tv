@@ -258,7 +258,10 @@ export function videoEngine(
           // Marked from the server's codec, as the TV can't say what it fails to decode.
           unplayable: native ? !native.decodes(streams[i]?.Codec) : undefined,
         })),
-        ...(native && file ? webosSubtitles(file.source) : []),
+        // The TV's renderer shows `{\an8}`-style tags as text, so it only draws what the page can't read.
+        ...(native && file && !ownTracks.length
+          ? webosSubtitles(file.source)
+          : []),
         ...ownTracks.map(ownSubtitleTrack),
         ...files.map(({ id, label }) => ({
           id,
