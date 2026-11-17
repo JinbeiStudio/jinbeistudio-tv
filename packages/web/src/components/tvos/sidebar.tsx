@@ -16,7 +16,7 @@ import {
 } from 'react-icons/bi';
 import { formatLocale } from '../../lib/i18n';
 import { useSession } from '@/lib/jellyfin/session';
-import { useLiveTvView } from '@/lib/jellyfin/queries';
+import { useLiveTvShown } from '@/features/live-tv/live-tv';
 import { useOwnAvatar } from '@/lib/jellyfin/history';
 import { navigate, to } from '../../lib/paths';
 import { downloadsHost } from '../../lib/downloads';
@@ -103,7 +103,7 @@ export function Sidebar({
   const { user, switchUser } = useSession();
   // The app's other sections, where it offers them.
   const inParty = !!useParty();
-  const live = !!useLiveTvView().data;
+  const live = useLiveTvShown();
   const sections: Section[] = [
     SECTIONS.home!,
     SECTIONS.discover!,

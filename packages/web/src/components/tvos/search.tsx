@@ -10,14 +10,11 @@ import {
 } from '@aiostreams/ui/context-menu';
 import { settings, useSetting } from '../../lib/settings';
 import { useAction } from '../../lib/input';
-import {
-  useLiveTvView,
-  useSearch,
-  useSearchSuggestions,
-} from '@/lib/jellyfin/queries';
+import { useSearch, useSearchSuggestions } from '@/lib/jellyfin/queries';
 import {
   airedShare,
   airingAt,
+  useLiveTvShown,
   useNow,
   useSchedules,
 } from '@/features/live-tv/live-tv';
@@ -52,7 +49,7 @@ export function TvosSearch({ initialTerm }: { initialTerm: string }) {
   const shows = useSearch(settled, 'Series', !combine);
   const people = useSearch(settled, 'Person');
   // As the app's: channels too, where the server has Live TV.
-  const live = !!useLiveTvView().data;
+  const live = useLiveTvShown();
   const channels = useSearch(settled, 'TvChannel', live);
   const history = useSearchHistory(user.Id!);
   // As the app's: titles the typing could mean, offered before it settles, and to a TV's own keyboard.
