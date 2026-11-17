@@ -48,6 +48,7 @@ import { useSession } from '@/lib/jellyfin/session';
 import { mayConvert, qualityOptions } from '@/lib/playback/quality';
 import { canMinimise } from '@/lib/playback/session';
 import { SettingsCard, SettingsRow } from './_components/settings-card';
+import { GestureSettings } from './_components/gesture-settings';
 import { BadgesRow, QuickFiltersRow } from './_components/version-settings';
 import {
   onDevice,
@@ -151,7 +152,11 @@ export function PlaybackSection() {
   const [engine] = useSetting(settings.player.engine);
   const [frameRate, setFrameRate] = useSetting(settings.video.frameRate);
   const [tunneling, setTunneling] = useSetting(settings.video.tunneling);
-  const androidTv = currentHost().name === 'android-app' && !!currentHost().tv;
+  const [gpuSubtitles, setGpuSubtitles] = useSetting(
+    settings.video.gpuSubtitles
+  );
+  const android = currentHost().name === 'android-app';
+  const androidTv = android && !!currentHost().tv;
   // ExoPlayer decodes with the hardware it picks itself; `auto` may still use mpv.
   const decoding =
     shell && !(currentHost().name === 'android-app' && engine === 'exoplayer');
@@ -379,6 +384,7 @@ export function PlaybackSection() {
           value={String(holdRate)}
           onValueChange={(v) => setHoldRate(Number(v))}
         />
+        {!currentHost().tv && <GestureSettings />}
         <Switch
           side="right"
           label={t`Show the controls on pause and skip`}
@@ -440,6 +446,19 @@ export function PlaybackSection() {
               }
               value={tunneling}
               onValueChange={setTunneling}
+            />
+          )}
+          {android && engine !== 'mpv' && (
+            <Switch
+              side="right"
+              label={t`Draw subtitles on the graphics card`}
+              help={
+                engine === 'auto'
+                  ? t`Blends subtitles on the graphics card instead of the processor, which takes less processor time. Only for videos ExoPlayer plays. Turn it off if subtitles look wrong.`
+                  : t`Blends subtitles on the graphics card instead of the processor, which takes less processor time. Turn it off if subtitles look wrong.`
+              }
+              value={gpuSubtitles}
+              onValueChange={setGpuSubtitles}
             />
           )}
         </SettingsCard>

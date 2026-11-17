@@ -259,7 +259,6 @@ export function useNowPlaying(
   }, [session, paused, rate]);
 
   React.useEffect(() => {
-    // A live stream's duration is infinite, which setPositionState throws on.
     if (!session || !durationMs || !Number.isFinite(durationMs)) return;
     const tell = () => {
       const { positionMs } = playhead;
