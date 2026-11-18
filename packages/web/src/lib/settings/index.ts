@@ -369,9 +369,8 @@ export const INTERFACE_STYLES = ['tvos', 'aiostreams'] as const;
 export type InterfaceStyle = (typeof INTERFACE_STYLES)[number];
 
 /*
- * Grouped as the settings page lists them. How the user likes to watch
- * follows their account; what suits this device's screen, input, sound or
- * hardware stays on it.
+ * How the user likes to watch follows their account; what suits this device's
+ * screen, input, sound or hardware stays on it.
  */
 export const settings = {
   interface: {
@@ -626,10 +625,6 @@ export const settings = {
     thumbnails: device<boolean>('aiostreams-web-controls-thumbnails', true),
     timeLeft: device<boolean>('aiostreams-web-controls-time-left', false),
     clock: device<boolean>('aiostreams-web-controls-clock', true),
-    showOnPauseAndSkip: device<boolean>(
-      'aiostreams-web-controls-show-on-pause-and-skip',
-      true
-    ),
   },
   player: {
     /** `app`, a player's id, or `custom` for `link`. */
@@ -694,6 +689,10 @@ export const settings = {
     ),
     gpuSubtitles: device<boolean>('aiostreams-web-video-gpu-subtitles', true),
     upscaling: device<boolean>('aiostreams-web-video-upscaling', false),
+    superResolution: device<boolean>(
+      'aiostreams-web-video-super-resolution',
+      false
+    ),
     hdrOutput: device<boolean>('aiostreams-web-video-hdr-output', false),
   },
   audio: {
