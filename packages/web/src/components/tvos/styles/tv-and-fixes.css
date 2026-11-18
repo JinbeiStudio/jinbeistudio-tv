@@ -153,6 +153,8 @@ html[data-tvos-build][data-tv]
     [data-ui='settings-card-item'],
     [data-ui='calendar-day'],
     [data-ui='auth-card'] input,
+    .UI-Input__root,
+    .UI-Textarea__root,
     .tv-links a,
     .tv-app-action :is(button, [data-ui='item-action'], [role='button']),
     [data-ui='player-button'],
