@@ -753,6 +753,11 @@
   html[data-tvos-build]:not([data-tv])
     [data-ui='user-picker-user']
     [data-focus-frame]
+    > *,
+  html[data-tvos-build]:not([data-tv])
+    [data-ui='user-picker-user']
+    [data-focus-frame]
+    > *
     > * {
     width: 88px !important;
     height: 88px !important;

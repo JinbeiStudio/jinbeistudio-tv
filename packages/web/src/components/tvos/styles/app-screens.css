@@ -111,6 +111,27 @@ html[data-tvos-build]
   --tw-ring-shadow: 0 0 #0000;
   outline: none !important;
 }
+/* At rest, the hint and icon light grey over the glass: the app's dark grey vanished over the sea. */
+html[data-tvos-build] :is(.UI-Input__root, .UI-Textarea__root)::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+html[data-tvos-build] .UI-Input__inputContainer svg {
+  color: rgba(255, 255, 255, 0.75);
+}
+/* Text fields light up white with black text when focused, as the sign-in's: white text on lighter glass read grey over the lit sea. */
+html[data-tvos-build] :is(.UI-Input__root, .UI-Textarea__root):focus {
+  background: rgba(255, 255, 255, 0.95) !important;
+  color: #000 !important;
+}
+html[data-tvos-build]
+  :is(.UI-Input__root, .UI-Textarea__root):focus::placeholder {
+  color: rgba(0, 0, 0, 0.4);
+}
+html[data-tvos-build]
+  .UI-Input__inputContainer:has(.UI-Input__root:focus)
+  :is(svg, button) {
+  color: rgba(0, 0, 0, 0.6);
+}
 /* Switches as Apple's: green when on. */
 html[data-tvos-build] .UI-Switch__root {
   border: 0 !important;
@@ -151,7 +172,8 @@ html[data-tvos-build] [data-page='sign-in'] [data-ui='auth-card'] {
   border-radius: max(28px, 2.6vw) !important;
   /* The pop-ups' Liquid Glass: blur and saturate what is behind, a faint rim, light on the top edge. */
   background: rgba(118, 120, 130, 0.36) !important;
-  backdrop-filter: blur(40px) saturate(1.8) brightness(1.18);
+  /* A light blur, so the sea's rays still show through. */
+  backdrop-filter: blur(12px) saturate(1.8) brightness(1.18);
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.3),
@@ -172,7 +194,7 @@ html[data-tvos-build] [data-page='sign-in'] [data-ui='auth-card'] label {
   font-size: max(15px, 1.15vw);
   font-weight: 600;
 }
-html[data-tvos-build] [data-page='sign-in'] [data-ui='auth-card'] input {
+html[data-tvos-build] [data-ui='auth-card'] input {
   height: max(48px, 4vw);
   padding: 0 max(16px, 1.4vw);
   font-size: max(17px, 1.5vw);
@@ -185,18 +207,21 @@ html[data-tvos-build] [data-page='sign-in'] [data-ui='auth-card'] input {
     background 0.2s ease,
     color 0.2s ease;
 }
-html[data-tvos-build] [data-page='sign-in'] [data-ui='auth-card'] input:focus {
+html[data-tvos-build] [data-ui='auth-card'] input:focus {
   background: rgba(255, 255, 255, 0.95) !important;
   color: #000;
+}
+html[data-tvos-build] [data-ui='auth-card'] input:focus::placeholder {
+  color: rgba(0, 0, 0, 0.4);
 }
 html[data-tvos-build]
   [data-page='sign-in']
   [data-ui='auth-card']
-  input:focus::placeholder {
-  color: rgba(0, 0, 0, 0.4);
-}
-html[data-tvos-build] [data-page='sign-in'] [data-ui='auth-card'] button[type='submit'],
-html[data-tvos-build] [data-page='sign-in'] [data-ui='auth-card'] .UI-Button__root {
+  button[type='submit'],
+html[data-tvos-build]
+  [data-page='sign-in']
+  [data-ui='auth-card']
+  .UI-Button__root {
   min-height: max(48px, 4vw);
   font-size: max(17px, 1.5vw);
   font-weight: 600;
@@ -222,7 +247,9 @@ html[data-tvos-build] [data-ui='user-picker-user'] {
   width: 10vw !important;
   outline: none !important;
 }
-html[data-tvos-build] [data-ui='user-picker-user'] [data-focus-frame] > * {
+/* The photo and the wrapper it animates in (SharedAvatar): sized alike, or the photo sits in a corner of the lifted frame. */
+html[data-tvos-build] [data-ui='user-picker-user'] [data-focus-frame] > *,
+html[data-tvos-build] [data-ui='user-picker-user'] [data-focus-frame] > * > * {
   width: 9vw !important;
   height: 9vw !important;
   font-size: 3vw !important;
@@ -267,16 +294,28 @@ html[data-tvos-build] [data-ui='settings-tab-group'] {
   background: rgba(255, 255, 255, 0.05) !important;
 }
 html[data-tvos-build] [data-ui='settings-tab'] {
+  /* Focus jumps, as tvOS lists: the app's 0.2 s fade left the old section's white behind like a ghost. */
+  transition: none !important;
   height: 2.9vw !important;
   border-radius: 0.9vw !important;
   font-size: 1.2vw !important;
 }
+/* The chosen section shows grey only once focus leaves the list: the TV moves it after the new section draws, so it lingered on the old one. */
 html[data-tvos-build] [data-ui='settings-tab'][data-state='active'] {
+  background: transparent !important;
+}
+html[data-tvos-build]
+  [data-ui='settings-tabs']:not(:focus-within)
+  [data-ui='settings-tab'][data-state='active'] {
   background: rgba(255, 255, 255, 0.14) !important;
 }
 html[data-tvos-build] [data-ui='settings-tab']:focus-visible {
   background: rgba(255, 255, 255, 0.95) !important;
   color: #000 !important;
+}
+/* Upstream's sliding marker (ui tabs.tsx) painted grey over our white focus and lingered on the old tab as it slid: tvOS lists mark in place. */
+html[data-tvos-build] [data-ui='settings-tab'] > span.absolute {
+  display: none !important;
 }
 html[data-tvos-build] [data-ui='settings-tab'] svg {
   font-size: 1.5vw;
@@ -318,7 +357,7 @@ html[data-tvos-build] [data-ui='downloads-section'] h2 {
 /* Their background is the ambient, in ambient.css. */
 html[data-tvos-build] [data-ui='settings-tab-group'] {
   background: rgba(118, 120, 130, 0.3) !important;
-  backdrop-filter: blur(40px) saturate(1.8) brightness(1.18);
+  backdrop-filter: blur(12px) saturate(1.8) brightness(1.18);
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.25);
@@ -327,8 +366,19 @@ html[data-tvos-build] [data-ui='settings-tab'] {
   height: 3.3vw !important;
   font-size: 1.3vw !important;
 }
-html[data-tvos-build] [data-ui='settings-tab'][data-state='active'] {
+html[data-tvos-build]
+  [data-ui='settings-tabs']:not(:focus-within)
+  [data-ui='settings-tab'][data-state='active'] {
   background: rgba(255, 255, 255, 0.22) !important;
+}
+/* Section names white, as tvOS lists: the app's 40% grey read faint over the lit sea. */
+html[data-tvos-build] [data-ui='settings-tab']:not(:focus-visible) {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+/* After the chosen tab's grey: focus opens the tab, so the focused one is always chosen too. */
+html[data-tvos-build] [data-ui='settings-tab']:focus-visible {
+  background: rgba(255, 255, 255, 0.95) !important;
+  color: #000 !important;
 }
 html[data-tvos-build] [data-ui='settings-card-title'] {
   margin: 0 0 0.5vw 1.6vw;
@@ -365,7 +415,15 @@ html[data-tvos-build] [data-ui='settings-card-item']:hover {
     color 0.15s ease;
 }
 /* A bar with a field or a menu in it keeps its look: only bars that are a switch or a button turn white. */
-html[data-tvos-build] [data-ui='settings-card-item']:focus-within:not(:has(.UI-Select__root, .UI-Input__root, .UI-NumberInput__root, .UI-Textarea__root)) {
+html[data-tvos-build]
+  [data-ui='settings-card-item']:focus-within:not(
+    :has(
+      .UI-Select__root,
+      .UI-Input__root,
+      .UI-NumberInput__root,
+      .UI-Textarea__root
+    )
+  ) {
   background: rgba(255, 255, 255, 0.95) !important;
   color: #000;
 }
@@ -373,14 +431,24 @@ html[data-tvos-build] [data-ui='settings-card-item'] .text-sm {
   font-size: max(12px, 0.98vw);
 }
 /* A row's title is a plain line, a switch's label or a field's label by kind of setting: one size for all three. */
-html[data-tvos-build] [data-ui='settings-card-item'] :is(p.font-semibold, .UI-Switch__label, .UI-BasicField__fieldLabel) {
+html[data-tvos-build]
+  [data-ui='settings-card-item']
+  :is(p.font-semibold, .UI-Switch__label, .UI-BasicField__fieldLabel) {
   font-size: max(14px, 1.25vw);
 }
-html[data-tvos-build] [data-ui='settings-card-item']:focus-within:not(:has(.UI-Select__root, .UI-Input__root, .UI-NumberInput__root, .UI-Textarea__root)) :is(p, span, label) {
+html[data-tvos-build]
+  [data-ui='settings-card-item']:focus-within:not(
+    :has(
+      .UI-Select__root,
+      .UI-Input__root,
+      .UI-NumberInput__root,
+      .UI-Textarea__root
+    )
+  )
+  :is(p, span, label) {
   color: inherit !important;
   opacity: 0.8;
 }
-
 
 /* A switch with a label draws its own hover box; the row is the box here, so it draws none. */
 html[data-tvos-build] [data-ui='settings-card-item'] .group\/switch {

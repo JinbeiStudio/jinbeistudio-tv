@@ -37,7 +37,7 @@ import { WatchNextSync } from '@/components/shell/watch-next';
 import { GlideLayers } from '@/components/shell/glide-layers';
 import { PinnedTargets } from './parts';
 import { BiChevronLeft, BiChevronRight } from 'react-icons/bi';
-import { MenuOpener, Pinned, Sea } from './parts';
+import { MenuOpener, Pinned, useHideSea } from './parts';
 import { tr } from './i18n';
 import { Sidebar } from './sidebar';
 import { TabBar, isTabRoot, useSwipeBack } from './tabbar';
@@ -261,6 +261,7 @@ export function TvosLayout() {
     select: (matches) => !!matches[0]?.pathname.startsWith('/play/'),
   });
   useServerEvents(playing);
+  useHideSea(playing);
   // As upstream's layout: the player is drawn here, and plays on in the mini player where the device allows it.
   const { user } = useSession();
   const playback = usePlayback();
@@ -500,7 +501,6 @@ export function TvosLayout() {
               {/* As the app's layout: on TVs the page moves in glide layers, fixed things beside them. */}
               <MenuOpener.Provider value={openSidebar}>
                 <PinnedTargets.Provider value={pinned}>
-                  {!playing && <Sea />}
                   <div ref={setUnder} className="contents" />
                   {/* Drawn once the places for fixed things exist, so none starts a frame inside the moving page. */}
                   {under && over && (

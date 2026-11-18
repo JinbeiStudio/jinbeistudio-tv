@@ -7,6 +7,7 @@ import { easeLayers, GLIDE_LAYERS } from '../../lib/input/glide';
 import { formatLocale } from '../../lib/i18n';
 import { useSession } from '@/lib/jellyfin/session';
 import { useOwnAvatar } from '@/lib/jellyfin/history';
+import { useTvosStyle } from '../../lib/tvos-style';
 import {
   backdropUrl,
   landscapeUrls,
@@ -397,28 +398,11 @@ export function Scroller({
   );
 }
 
-/** A light spot: radii and centre as shares of the box, then its colour (rgba). */
-type Spot = [number, number, number, number, [number, number, number, number]];
-
-// ambient.css's --tv-current-a and -b, as each spot's radial-gradient(rx ry at x y, colour, transparent 70%).
-const CURRENT_A: Spot[] = [
-  [0.4, 0.24, 0.32, 0.58, [34, 211, 238, 0.26]],
-  [0.44, 0.28, 0.7, 0.34, [37, 99, 235, 0.35]],
-  [0.32, 0.2, 0.58, 0.82, [14, 165, 233, 0.23]],
-];
-const CURRENT_B: Spot[] = [
-  [0.48, 0.17, 0.4, 0.3, [56, 189, 248, 0.18]],
-  [0.42, 0.21, 0.78, 0.7, [45, 212, 191, 0.2]],
-  [0.36, 0.19, 0.18, 0.76, [29, 78, 216, 0.28]],
-];
-
-/** One of the sea's currents, drawn once into a small canvas the GPU stretches: as CSS
- * gradients 1.7 screens wide, a TV took half a second to draw them as the hero lowered. */
-// ambient.css's grain over --tv-ambient, the same image.
+// A faint grain keeps the TV from drawing the gradient in bands.
 const GRAIN =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.035 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E";
 
-/** The sea's still water (--tv-ambient), drawn once into a canvas: as a CSS background
+/** The sea's still water, drawn once into a canvas: as a CSS background
  * a TV redrew it whole each time the hero lowered, freezing the move for ~200 ms. */
 function SeaWater() {
   const ref = React.useRef<HTMLCanvasElement>(null);
@@ -426,30 +410,14 @@ function SeaWater() {
     const ctx = ref.current?.getContext('2d', { alpha: false });
     if (!ctx) return;
     const { width: w, height: h } = ctx.canvas;
-    // linear-gradient(170deg, …): CSS's gradient line through the centre, as long as the box needs.
-    const angle = (170 * Math.PI) / 180;
-    const [dx, dy] = [Math.sin(angle), -Math.cos(angle)];
-    const half = (Math.abs(w * dx) + Math.abs(h * dy)) / 2;
-    const deep = ctx.createLinearGradient(
-      w / 2 - dx * half,
-      h / 2 - dy * half,
-      w / 2 + dx * half,
-      h / 2 + dy * half
-    );
-    deep.addColorStop(0, '#010208');
-    deep.addColorStop(0.4, '#020818');
-    deep.addColorStop(0.72, '#04132a');
-    deep.addColorStop(1, '#062436');
-    ctx.fillStyle = deep;
+    // Teal water, lighter toward the surface, as jinbeistudio.com and the TV launcher.
+    const water = ctx.createLinearGradient(0, 0, 0, h);
+    water.addColorStop(0, '#2a7380');
+    water.addColorStop(0.25, '#175560');
+    water.addColorStop(0.6, '#10424c');
+    water.addColorStop(1, '#082a32');
+    ctx.fillStyle = water;
     ctx.fillRect(0, 0, w, h);
-    // radial-gradient(70vw 60vh at 50% 110%, rgba(12, 110, 140, 0.17), transparent 70%).
-    ctx.setTransform(0.7 * w, 0, 0, 0.6 * h, 0.5 * w, 1.1 * h);
-    const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
-    glow.addColorStop(0, 'rgba(12, 110, 140, 0.17)');
-    glow.addColorStop(0.7, 'rgba(12, 110, 140, 0)');
-    ctx.fillStyle = glow;
-    ctx.fillRect(-0.5 / 0.7, -1.1 / 0.6, 1 / 0.7, 1 / 0.6);
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
     const grain = new Image();
     grain.onload = () => {
       const pattern = ctx.createPattern(grain, 'repeat');
@@ -465,43 +433,303 @@ function SeaWater() {
   return <canvas ref={ref} className="tv-sea" width={1920} height={1080} />;
 }
 
-function SeaCurrent({
-  spots,
+// The light from the surface, as the TV launcher draws it: a fan of rays from a point above the screen.
+const APEX_X = 0.58;
+const RAYS = { width: 2400, height: 1300 };
+// SVG noise turned into pale ripples, tiled along the surface.
+const CAUSTICS =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='300'%3E%3Cfilter id='c' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.012 0.045' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.8 0 0 0 0 0.97 0 0 0 0 1 0 0 0 -2.4 1.25'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23c)'/%3E%3C/svg%3E";
+
+/** The sun's glow at the surface, drawn once at half size. */
+function SeaSun() {
+  const ref = React.useRef<HTMLCanvasElement>(null);
+  React.useEffect(() => {
+    const ctx = ref.current?.getContext('2d');
+    if (!ctx) return;
+    const { width: w, height: h } = ctx.canvas;
+    const glow = ctx.createRadialGradient(
+      APEX_X * w,
+      -0.05 * h,
+      0,
+      APEX_X * w,
+      -0.05 * h,
+      0.4 * w
+    );
+    glow.addColorStop(0, 'rgba(230, 251, 255, 0.6)');
+    glow.addColorStop(0.4, 'rgba(127, 220, 239, 0.18)');
+    glow.addColorStop(0.75, 'rgba(127, 220, 239, 0)');
+    ctx.fillStyle = glow;
+    // Filled under a wide, soft-edged arc just below the top, as the Mac app's glow ends: the surface seen from beneath.
+    ctx.filter = 'blur(4px)';
+    ctx.beginPath();
+    ctx.ellipse(
+      APEX_X * w,
+      0.035 * h + 0.9 * h,
+      0.55 * w,
+      0.9 * h,
+      0,
+      0,
+      2 * Math.PI
+    );
+    ctx.fill();
+  }, []);
+  return <canvas ref={ref} className="tv-sea-sun" width={960} height={540} />;
+}
+
+/** A fan of soft rays, drawn once at half size; CSS only sways it. */
+function SeaRays({
+  alpha,
+  step,
+  width,
+  blur,
   className,
 }: {
-  spots: Spot[];
+  alpha: number;
+  step: number;
+  width: number;
+  blur: number;
   className: string;
 }) {
   const ref = React.useRef<HTMLCanvasElement>(null);
   React.useEffect(() => {
     const ctx = ref.current?.getContext('2d');
     if (!ctx) return;
-    const { width, height } = ctx.canvas;
-    // CSS paints the first gradient on top.
-    for (const [rx, ry, x, y, [r, g, b, a]] of [...spots].reverse()) {
-      ctx.setTransform(rx * width, 0, 0, ry * height, x * width, y * height);
-      const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
-      // Fading to the same colour, as CSS's transparent does, rather than to black.
-      glow.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${a})`);
-      glow.addColorStop(0.7, `rgba(${r}, ${g}, ${b}, 0)`);
-      ctx.fillStyle = glow;
-      ctx.fillRect(-x / rx, -y / ry, 1 / rx, 1 / ry);
+    const ax = RAYS.width / 4,
+      reach = RAYS.height;
+    ctx.filter = `blur(${blur / 2}px)`;
+    // Seeded, so each load draws the same fan. As real shafts: in loose clusters, mostly thin with a few broad faint
+    // ones, each fading at its own depth.
+    let seed = step * 7919;
+    const rand = () => {
+      seed = (seed * 16807) % 2147483647;
+      return seed / 2147483647;
+    };
+    for (let a = 30 + rand() * step; a < 150;) {
+      const broad = rand() < 0.15,
+        w = width * (broad ? 2.5 + rand() * 2 : 0.4 + rand() * 1.1),
+        strength = (broad ? 0.5 : 0.7 + rand() * 0.5) * alpha,
+        fade = 594 * (0.8 + rand() * 0.5);
+      const fill = ctx.createRadialGradient(ax, 0, 0, ax, 0, fade);
+      fill.addColorStop(0, `rgba(200, 245, 250, ${strength})`);
+      fill.addColorStop(0.45, `rgba(200, 245, 250, ${strength * 0.4})`);
+      fill.addColorStop(0.8, 'rgba(200, 245, 250, 0)');
+      ctx.fillStyle = fill;
+      const a0 = (a * Math.PI) / 180,
+        a1 = ((a + w) * Math.PI) / 180;
+      ctx.beginPath();
+      ctx.moveTo(ax, 0);
+      ctx.lineTo(ax + Math.cos(a0) * reach, Math.sin(a0) * reach);
+      ctx.lineTo(ax + Math.cos(a1) * reach, Math.sin(a1) * reach);
+      ctx.closePath();
+      ctx.fill();
+      // Close gaps inside a cluster, wide ones between them.
+      a += step * (rand() < 0.35 ? 0.3 + rand() * 0.4 : 0.8 + rand() * 1.1);
     }
-  }, [spots]);
+    ctx.globalAlpha = 1;
+    // Clear above the sun's arc, so the rays start under it; the canvas top sits 108px above the screen.
+    ctx.filter = 'none';
+    ctx.globalCompositeOperation = 'destination-out';
+    const top = ctx.createLinearGradient(0, 0, 0, 90);
+    top.addColorStop(0.6, '#000');
+    top.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = top;
+    ctx.fillRect(0, 0, RAYS.width / 2, 90);
+  }, [alpha, step, width, blur]);
   return (
-    <div className={`tv-current ${className}`}>
-      <canvas ref={ref} width={408} height={230} />
-    </div>
+    <canvas
+      ref={ref}
+      className={`tv-sea-rays ${className}`}
+      width={RAYS.width / 2}
+      height={RAYS.height / 2}
+    />
   );
 }
 
-/** Jinbei's sea, under every page of the layout: drawn once, only its currents move. */
-export function Sea() {
+/** Ripples of light near the surface, fading halfway down; drawn after the page settles, as the noise is slow on a TV. */
+function SeaCaustics() {
+  const ref = React.useRef<HTMLCanvasElement>(null);
+  React.useEffect(() => {
+    const ctx = ref.current?.getContext('2d');
+    if (!ctx) return;
+    const tile = new Image();
+    tile.onload = () => {
+      const { width: w, height: h } = ctx.canvas;
+      ctx.scale(0.5, 0.5);
+      for (let y = 0; y < 2 * h; y += 300)
+        for (let x = 0; x < 2 * w; x += 600) ctx.drawImage(tile, x, y);
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.globalCompositeOperation = 'destination-in';
+      const fade = ctx.createLinearGradient(0, 0, 0, h);
+      // Clear above the sun's arc too (the canvas top sits 216px above the screen), as the rays are.
+      fade.addColorStop(0.41, 'rgba(0, 0, 0, 0)');
+      fade.addColorStop(0.5, '#000');
+      fade.addColorStop(0.6, '#000');
+      fade.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = fade;
+      ctx.fillRect(0, 0, w, h);
+      ref.current?.classList.add('is-drawn');
+    };
+    const later = window.setTimeout(() => (tile.src = CAUSTICS), 1500);
+    return () => {
+      window.clearTimeout(later);
+      tile.onload = null;
+    };
+  }, []);
   return (
-    <div className="tv-sea-layer" aria-hidden>
+    <canvas ref={ref} className="tv-sea-caustics" width={1260} height={270} />
+  );
+}
+
+// Marine snow rising, as the TV launcher's: per layer, a seed, flake count, size and opacity.
+const SNOW = [
+  [1, 140, 2, 0.6, 'tv-sea-snow-far'],
+  [2, 70, 3.5, 0.65, 'tv-sea-snow-mid'],
+  [3, 24, 5, 0.55, 'tv-sea-snow-near'],
+] as const;
+
+function seeded(seed: number) {
+  let a = seed;
+  return () => {
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** One layer of flakes two screens tall at half size, repeated a screen lower so its slide loops; one dot stamped per flake (a gradient each was slow on a TV). */
+function SeaSnow({
+  seed,
+  count,
+  size,
+  alpha,
+  className,
+}: {
+  seed: number;
+  count: number;
+  size: number;
+  alpha: number;
+  className: string;
+}) {
+  const ref = React.useRef<HTMLCanvasElement>(null);
+  React.useEffect(() => {
+    const g = ref.current?.getContext('2d');
+    if (!g) return;
+    const later = window.setTimeout(() => {
+      const rand = seeded(seed);
+      const r = size * 1.5 + 0.5;
+      const dot = document.createElement('canvas');
+      dot.width = dot.height = Math.ceil(r) * 2;
+      const d = dot.getContext('2d');
+      if (!d) return;
+      const c = dot.width / 2;
+      const fill = d.createRadialGradient(c, c, 0, c, c, r);
+      fill.addColorStop(0, 'rgba(200, 245, 250, 1)');
+      fill.addColorStop(0.45, 'rgba(200, 245, 250, 0.5)');
+      fill.addColorStop(1, 'rgba(200, 245, 250, 0)');
+      d.fillStyle = fill;
+      d.fillRect(0, 0, dot.width, dot.height);
+      g.scale(0.5, 0.5);
+      for (let i = 0; i < count; i++) {
+        const x = Math.round(rand() * 1920);
+        const y = Math.round(rand() * 1080);
+        g.globalAlpha = alpha * (0.4 + rand() * 0.6) * 0.6;
+        g.drawImage(dot, x - c, y - c);
+        g.drawImage(dot, x - c, y + 1080 - c);
+      }
+      ref.current?.classList.add('is-drawn');
+    }, 1800);
+    return () => window.clearTimeout(later);
+  }, [seed, count, size, alpha]);
+  return (
+    <canvas
+      ref={ref}
+      className={`tv-sea-snow ${className}`}
+      width={960}
+      height={1080}
+    />
+  );
+}
+
+/** How deep the reader is, in screens: the sea darkens a step at a time, so a TV only fades one layer now and then. */
+function useDepth(ref: React.RefObject<HTMLDivElement | null>) {
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const onScroll = () => {
+      const depth = String(
+        Math.min(3, Math.floor(window.scrollY / window.innerHeight))
+      );
+      if (el.dataset.depth !== depth) el.dataset.depth = depth;
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [ref]);
+}
+
+// Set by the layout while the player fills the screen, so the TV stops compositing a sea nobody sees.
+let seaHidden = false;
+const seaListeners = new Set<() => void>();
+export function useHideSea(hide: boolean) {
+  React.useEffect(() => {
+    const set = (value: boolean) => {
+      seaHidden = value;
+      seaListeners.forEach((l) => l());
+    };
+    set(hide);
+    return () => set(false);
+  }, [hide]);
+}
+
+/** Jinbei's sea, mounted once at the app's root (app.tsx) under every screen of the tvOS style: sign-in, loading, who's watching and each page. */
+export function Sea() {
+  const tvos = useTvosStyle();
+  const hidden = React.useSyncExternalStore(
+    (l) => {
+      seaListeners.add(l);
+      return () => seaListeners.delete(l);
+    },
+    () => seaHidden
+  );
+  return tvos && !hidden ? <SeaLayer /> : null;
+}
+
+/** Drawn once, only its light sways and drifts. */
+function SeaLayer() {
+  const ref = React.useRef<HTMLDivElement>(null);
+  useDepth(ref);
+  return (
+    <div ref={ref} className="tv-sea-layer" aria-hidden>
       <SeaWater />
-      <SeaCurrent spots={CURRENT_A} className="tv-current-a" />
-      <SeaCurrent spots={CURRENT_B} className="tv-current-b" />
+      <SeaSun />
+      <SeaRays
+        alpha={0.1}
+        step={2.6}
+        width={1.1}
+        blur={5}
+        className="tv-sea-rays-a"
+      />
+      <SeaRays
+        alpha={0.07}
+        step={4}
+        width={1.5}
+        blur={8}
+        className="tv-sea-rays-b"
+      />
+      <SeaCaustics />
+      {SNOW.map(([seed, count, size, alpha, className]) => (
+        <SeaSnow
+          key={seed}
+          seed={seed}
+          count={count}
+          size={size}
+          alpha={alpha}
+          className={className}
+        />
+      ))}
+      {/* Over the light, so going deeper dims it too. */}
+      <div className="tv-sea-abyss" />
     </div>
   );
 }
