@@ -132,10 +132,8 @@ html[data-tvos-build] .tv-sea-layer[data-depth='3'] .tv-sea-abyss {
   opacity: 0.82;
 }
 
-/* The light holds still under a page's artwork (data-art, parts.tsx) and, on TVs, while the remote moves focus (data-moving, layout.tsx). */
-html[data-tvos-build][data-art] .tv-sea-layer *,
-html[data-tvos-build][data-tv][data-moving] .tv-sea-layer *,
-html[data-tvos-build][data-tv][data-gliding] .tv-sea-layer * {
+/* The light holds still under a page's artwork (data-art, parts.tsx); it keeps moving while the remote moves focus (owner's choice, to be measured). */
+html[data-tvos-build][data-art] .tv-sea-layer * {
   animation-play-state: paused;
 }
 
