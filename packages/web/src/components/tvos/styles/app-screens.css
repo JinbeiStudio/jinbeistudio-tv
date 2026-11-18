@@ -222,7 +222,9 @@ html[data-tvos-build] [data-ui='user-picker-user'] {
   width: 10vw !important;
   outline: none !important;
 }
-html[data-tvos-build] [data-ui='user-picker-user'] [data-focus-frame] > * {
+/* The photo and the wrapper it animates in (SharedAvatar): sized alike, or the photo sits in a corner of the lifted frame. */
+html[data-tvos-build] [data-ui='user-picker-user'] [data-focus-frame] > *,
+html[data-tvos-build] [data-ui='user-picker-user'] [data-focus-frame] > * > * {
   width: 9vw !important;
   height: 9vw !important;
   font-size: 3vw !important;
