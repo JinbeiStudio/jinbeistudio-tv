@@ -361,6 +361,10 @@ html[data-tvos-build] [data-ui='settings-tab'] {
 html[data-tvos-build] [data-ui='settings-tab'][data-state='active'] {
   background: rgba(255, 255, 255, 0.22) !important;
 }
+/* Section names white, as tvOS lists: the app's 40% grey read faint over the lit sea. */
+html[data-tvos-build] [data-ui='settings-tab']:not(:focus-visible) {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
 /* After the chosen tab's grey: focus opens the tab, so the focused one is always chosen too. */
 html[data-tvos-build] [data-ui='settings-tab']:focus-visible {
   background: rgba(255, 255, 255, 0.95) !important;
