@@ -66,6 +66,34 @@ html[data-tvos-build] .tv-sea-layer .tv-sea-caustics {
 html[data-tvos-build] .tv-sea-layer .tv-sea-caustics.is-drawn {
   opacity: 0.45;
 }
+/* Marine snow, as the TV launcher's: each layer two screens tall, slid up a screen and looped. */
+html[data-tvos-build] .tv-sea-layer .tv-sea-snow {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 200%;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  will-change: transform;
+}
+html[data-tvos-build] .tv-sea-layer .tv-sea-snow.is-drawn {
+  opacity: 1;
+}
+html[data-tvos-build] .tv-sea-layer .tv-sea-snow-far {
+  animation: tv-snow 140s linear infinite;
+}
+html[data-tvos-build] .tv-sea-layer .tv-sea-snow-mid {
+  animation: tv-snow 90s linear infinite;
+}
+html[data-tvos-build] .tv-sea-layer .tv-sea-snow-near {
+  animation: tv-snow 55s linear infinite;
+}
+@keyframes tv-snow {
+  to {
+    transform: translate3d(0, -50%, 0);
+  }
+}
 @keyframes tv-sun {
   to {
     opacity: 0.7;

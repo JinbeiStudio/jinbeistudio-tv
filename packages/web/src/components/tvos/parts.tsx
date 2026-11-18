@@ -580,6 +580,77 @@ function SeaCaustics() {
   );
 }
 
+// Marine snow rising, as the TV launcher's: per layer, a seed, flake count, size and opacity.
+const SNOW = [
+  [1, 140, 2, 0.6, 'tv-sea-snow-far'],
+  [2, 70, 3.5, 0.65, 'tv-sea-snow-mid'],
+  [3, 24, 5, 0.55, 'tv-sea-snow-near'],
+] as const;
+
+function seeded(seed: number) {
+  let a = seed;
+  return () => {
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** One layer of flakes two screens tall at half size, repeated a screen lower so its slide loops; one dot stamped per flake (a gradient each was slow on a TV). */
+function SeaSnow({
+  seed,
+  count,
+  size,
+  alpha,
+  className,
+}: {
+  seed: number;
+  count: number;
+  size: number;
+  alpha: number;
+  className: string;
+}) {
+  const ref = React.useRef<HTMLCanvasElement>(null);
+  React.useEffect(() => {
+    const g = ref.current?.getContext('2d');
+    if (!g) return;
+    const later = window.setTimeout(() => {
+      const rand = seeded(seed);
+      const r = size * 1.5 + 0.5;
+      const dot = document.createElement('canvas');
+      dot.width = dot.height = Math.ceil(r) * 2;
+      const d = dot.getContext('2d');
+      if (!d) return;
+      const c = dot.width / 2;
+      const fill = d.createRadialGradient(c, c, 0, c, c, r);
+      fill.addColorStop(0, 'rgba(200, 245, 250, 1)');
+      fill.addColorStop(0.45, 'rgba(200, 245, 250, 0.5)');
+      fill.addColorStop(1, 'rgba(200, 245, 250, 0)');
+      d.fillStyle = fill;
+      d.fillRect(0, 0, dot.width, dot.height);
+      g.scale(0.5, 0.5);
+      for (let i = 0; i < count; i++) {
+        const x = Math.round(rand() * 1920);
+        const y = Math.round(rand() * 1080);
+        g.globalAlpha = alpha * (0.4 + rand() * 0.6) * 0.6;
+        g.drawImage(dot, x - c, y - c);
+        g.drawImage(dot, x - c, y + 1080 - c);
+      }
+      ref.current?.classList.add('is-drawn');
+    }, 1800);
+    return () => window.clearTimeout(later);
+  }, [seed, count, size, alpha]);
+  return (
+    <canvas
+      ref={ref}
+      className={`tv-sea-snow ${className}`}
+      width={960}
+      height={1080}
+    />
+  );
+}
+
 /** How deep the reader is, in screens: the sea darkens a step at a time, so a TV only fades one layer now and then. */
 function useDepth(ref: React.RefObject<HTMLDivElement | null>) {
   React.useEffect(() => {
@@ -647,6 +718,16 @@ function SeaLayer() {
         className="tv-sea-rays-b"
       />
       <SeaCaustics />
+      {SNOW.map(([seed, count, size, alpha, className]) => (
+        <SeaSnow
+          key={seed}
+          seed={seed}
+          count={count}
+          size={size}
+          alpha={alpha}
+          className={className}
+        />
+      ))}
       {/* Over the light, so going deeper dims it too. */}
       <div className="tv-sea-abyss" />
     </div>
