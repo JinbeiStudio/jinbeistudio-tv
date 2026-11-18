@@ -111,6 +111,13 @@ html[data-tvos-build]
   --tw-ring-shadow: 0 0 #0000;
   outline: none !important;
 }
+/* At rest, the hint and icon light grey over the glass: the app's dark grey vanished over the sea. */
+html[data-tvos-build] :is(.UI-Input__root, .UI-Textarea__root)::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+html[data-tvos-build] .UI-Input__inputContainer svg {
+  color: rgba(255, 255, 255, 0.75);
+}
 /* Text fields light up white with black text when focused, as the sign-in's: white text on lighter glass read grey over the lit sea. */
 html[data-tvos-build] :is(.UI-Input__root, .UI-Textarea__root):focus {
   background: rgba(255, 255, 255, 0.95) !important;
@@ -298,6 +305,10 @@ html[data-tvos-build] [data-ui='settings-tab']:focus-visible {
   background: rgba(255, 255, 255, 0.95) !important;
   color: #000 !important;
 }
+/* Upstream's sliding marker (ui tabs.tsx) painted grey over our white focus and lingered on the old tab as it slid: tvOS lists mark in place. */
+html[data-tvos-build] [data-ui='settings-tab'] > span.absolute {
+  display: none !important;
+}
 html[data-tvos-build] [data-ui='settings-tab'] svg {
   font-size: 1.5vw;
   /* The app nudges it on hover; tvOS lists hold still. */
@@ -349,6 +360,11 @@ html[data-tvos-build] [data-ui='settings-tab'] {
 }
 html[data-tvos-build] [data-ui='settings-tab'][data-state='active'] {
   background: rgba(255, 255, 255, 0.22) !important;
+}
+/* After the chosen tab's grey: focus opens the tab, so the focused one is always chosen too. */
+html[data-tvos-build] [data-ui='settings-tab']:focus-visible {
+  background: rgba(255, 255, 255, 0.95) !important;
+  color: #000 !important;
 }
 html[data-tvos-build] [data-ui='settings-card-title'] {
   margin: 0 0 0.5vw 1.6vw;
