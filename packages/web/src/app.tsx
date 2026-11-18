@@ -16,6 +16,7 @@ import {
 import { webRouter } from './router';
 import { SignInScreen, Unreachable, UserPicker } from './app/sign-in/page';
 import { PageBackground } from './components/shell/layout';
+import { Sea } from './components/tvos/parts';
 import { apiBase, JellyfinClient } from './lib/jellyfin/client';
 import { navigate, to } from './lib/paths';
 import {
@@ -79,6 +80,7 @@ export default function JellyfinWebApp() {
             mobileOffset={{ top: 'calc(16px + env(safe-area-inset-top))' }}
           />
           <PageBackground />
+          <Sea />
           <ThemeStyles />
           <InputSetup router={webRouter} />
           {shellHost() && <ShellSetup />}
