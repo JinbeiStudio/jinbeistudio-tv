@@ -542,6 +542,25 @@ html[data-tvos-build] [data-ui='skip-segment'] button {
     inset 0 1px 0 rgba(255, 255, 255, 0.45),
     0 0.6rem 1.6rem rgba(0, 0, 0, 0.4);
 }
+/* With the controls up, on the title's line: the app's height sits on our taller button row. */
+@media (min-width: 701px) {
+  html[data-tvos-build]
+    [data-ui='player-controls'][data-visible]
+    [data-ui='skip-segment'] {
+    bottom: calc(
+      var(--control, 2.3rem) + 6.6rem + env(safe-area-inset-bottom)
+    ) !important;
+  }
+}
+html[data-tvos-build][data-tv]
+  [data-ui='player-controls'][data-visible]
+  [data-ui='skip-segment'] {
+  right: var(--tv-gutter, 5.7vw) !important;
+  bottom: calc(
+    2.2rem + 1.5rem + 0.5vw + 1.25rem + 0.9vw + var(--control, 3vw) + 1.2rem +
+      env(safe-area-inset-bottom)
+  ) !important;
+}
 html[data-tvos-build] [data-ui='skip-segment'] button:focus-visible,
 html[data-tvos-build] [data-ui='skip-segment'] button:hover {
   background: rgba(255, 255, 255, 0.96) !important;

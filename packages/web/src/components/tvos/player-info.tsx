@@ -14,8 +14,7 @@ import { tr } from './i18n';
 
 /**
  * The Info tab Apple's player shows under its bar: the title's summary and a
- * way to start again. Opened with its button (shown with the controls), the
- * remote's Down from the progress bar, or the I key.
+ * way to start again. Opened with its button (shown with the controls) or the I key.
  */
 /**
  * The remote's OK plays or pauses when no control has the focus, showing the
@@ -84,7 +83,7 @@ function useBarArrows() {
         first?.focus({ focusVisible: true } as FocusOptions);
       } else if (e.key === 'ArrowDown' && focused && row.contains(focused)) {
         bar.focus({ focusVisible: true } as FocusOptions);
-        // This Down only reaches the bar; Info opens on the next one.
+        // This Down only reaches the bar.
         e.stopImmediatePropagation();
       }
     };
@@ -131,33 +130,16 @@ function Info({ itemId, source }: { itemId: string; source?: string }) {
   const row = useButtonRow();
 
   React.useEffect(() => {
-    // Where the focus was before this key, as the app's own move has already run when it arrives here.
-    let before: Element | null = document.activeElement;
-    const settle = () => {
-      before = document.activeElement;
-    };
     const onKey = (e: KeyboardEvent) => {
-      // The bar, or nothing focused with the controls up, where the arrows work the bar.
-      const onBar =
-        !!before?.closest('[data-ui="seek-bar"]') ||
-        ((!before || before === document.body) &&
-          !!document.querySelector(
-            '[data-ui="player-controls"][data-visible]'
-          ));
-      if (e.key === 'i' || (e.key === 'ArrowDown' && onBar)) {
+      // Down no longer opens it (owner's choice): only its button and the I key.
+      if (e.key === 'i') {
         e.preventDefault();
         e.stopPropagation();
         setOpen(true);
       }
     };
     window.addEventListener('keydown', onKey, true);
-    window.addEventListener('keyup', settle, true);
-    window.addEventListener('pointerup', settle, true);
-    return () => {
-      window.removeEventListener('pointerup', settle, true);
-      window.removeEventListener('keydown', onKey, true);
-      window.removeEventListener('keyup', settle, true);
-    };
+    return () => window.removeEventListener('keydown', onKey, true);
   }, [itemId]);
 
   if (!item.data) return null;
