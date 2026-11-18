@@ -294,6 +294,8 @@ html[data-tvos-build] [data-ui='settings-tab-group'] {
   background: rgba(255, 255, 255, 0.05) !important;
 }
 html[data-tvos-build] [data-ui='settings-tab'] {
+  /* Focus jumps, as tvOS lists: the app's 0.2 s fade left the old section's white behind like a ghost. */
+  transition: none !important;
   height: 2.9vw !important;
   border-radius: 0.9vw !important;
   font-size: 1.2vw !important;
