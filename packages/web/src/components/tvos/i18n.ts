@@ -18,6 +18,8 @@ const FR: Record<string, string> = {
   More: 'Plus',
   Back: 'Retour',
   'A new version is available': 'Une nouvelle version est disponible',
+  'This version didn’t start, trying the next one':
+    'Cette version ne démarre pas, essai de la suivante',
   Reload: 'Recharger',
   Discover: 'Découvrir',
   Search: 'Rechercher',
