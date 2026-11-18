@@ -300,7 +300,13 @@ html[data-tvos-build] [data-ui='settings-tab'] {
   border-radius: 0.9vw !important;
   font-size: 1.2vw !important;
 }
+/* The chosen section shows grey only once focus leaves the list: the TV moves it after the new section draws, so it lingered on the old one. */
 html[data-tvos-build] [data-ui='settings-tab'][data-state='active'] {
+  background: transparent !important;
+}
+html[data-tvos-build]
+  [data-ui='settings-tabs']:not(:focus-within)
+  [data-ui='settings-tab'][data-state='active'] {
   background: rgba(255, 255, 255, 0.14) !important;
 }
 html[data-tvos-build] [data-ui='settings-tab']:focus-visible {
@@ -360,7 +366,9 @@ html[data-tvos-build] [data-ui='settings-tab'] {
   height: 3.3vw !important;
   font-size: 1.3vw !important;
 }
-html[data-tvos-build] [data-ui='settings-tab'][data-state='active'] {
+html[data-tvos-build]
+  [data-ui='settings-tabs']:not(:focus-within)
+  [data-ui='settings-tab'][data-state='active'] {
   background: rgba(255, 255, 255, 0.22) !important;
 }
 /* Section names white, as tvOS lists: the app's 40% grey read faint over the lit sea. */
