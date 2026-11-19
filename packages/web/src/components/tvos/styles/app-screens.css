@@ -449,7 +449,7 @@ html[data-tvos-build]
       .UI-Textarea__root
     )
   )
-  :is(p, span, label) {
+  :is(p, span, label, .UI-BasicField__fieldHelpText) {
   color: inherit !important;
   opacity: 0.8;
 }
