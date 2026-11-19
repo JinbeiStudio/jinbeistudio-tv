@@ -440,11 +440,22 @@ const RAYS = { width: 2400, height: 1300 };
 const CAUSTICS =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='300'%3E%3Cfilter id='c' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.012 0.045' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.8 0 0 0 0 0.97 0 0 0 0 1 0 0 0 -2.4 1.25'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23c)'/%3E%3C/svg%3E";
 
-/** Blurs as `filter` would where the canvas ignores it (WebKit, so the Mac app): the canvas itself, by CSS, at its 2x display. */
+let canvasBlurs: boolean | undefined;
+
+/** Blurs as `filter` would where the canvas ignores it (WebKit, so the Mac app, keeps the value but draws sharp): by CSS, at its 2x display. */
 function blurCanvas(ctx: CanvasRenderingContext2D, px: number) {
-  ctx.filter = `blur(${px}px)`;
-  if (ctx.filter !== `blur(${px}px)`)
-    ctx.canvas.style.filter = `blur(${px * 2}px)`;
+  if (canvasBlurs === undefined) {
+    // One dot drawn blurred: a working filter spreads it to its neighbour.
+    const probe = document.createElement('canvas').getContext('2d');
+    if (probe) {
+      probe.canvas.width = probe.canvas.height = 5;
+      probe.filter = 'blur(1px)';
+      probe.fillRect(2, 2, 1, 1);
+    }
+    canvasBlurs = !!probe && probe.getImageData(1, 2, 1, 1).data[3] > 0;
+  }
+  if (canvasBlurs) ctx.filter = `blur(${px}px)`;
+  else ctx.canvas.style.filter = `blur(${px * 2}px)`;
 }
 
 /** The sun's glow at the surface, drawn once at half size. */
