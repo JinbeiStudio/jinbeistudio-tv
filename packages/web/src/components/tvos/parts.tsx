@@ -440,6 +440,13 @@ const RAYS = { width: 2400, height: 1300 };
 const CAUSTICS =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='300'%3E%3Cfilter id='c' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.012 0.045' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.8 0 0 0 0 0.97 0 0 0 0 1 0 0 0 -2.4 1.25'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23c)'/%3E%3C/svg%3E";
 
+/** Blurs as `filter` would where the canvas ignores it (WebKit, so the Mac app): the canvas itself, by CSS, at its 2x display. */
+function blurCanvas(ctx: CanvasRenderingContext2D, px: number) {
+  ctx.filter = `blur(${px}px)`;
+  if (ctx.filter !== `blur(${px}px)`)
+    ctx.canvas.style.filter = `blur(${px * 2}px)`;
+}
+
 /** The sun's glow at the surface, drawn once at half size. */
 function SeaSun() {
   const ref = React.useRef<HTMLCanvasElement>(null);
@@ -460,7 +467,7 @@ function SeaSun() {
     glow.addColorStop(0.75, 'rgba(127, 220, 239, 0)');
     ctx.fillStyle = glow;
     // Filled under a wide, soft-edged arc just below the top, as the Mac app's glow ends: the surface seen from beneath.
-    ctx.filter = 'blur(4px)';
+    blurCanvas(ctx, 4);
     ctx.beginPath();
     ctx.ellipse(
       APEX_X * w,
@@ -496,7 +503,7 @@ function SeaRays({
     if (!ctx) return;
     const ax = RAYS.width / 4,
       reach = RAYS.height;
-    ctx.filter = `blur(${blur / 2}px)`;
+    blurCanvas(ctx, blur / 2);
     // Seeded, so each load draws the same fan. As real shafts: in loose clusters, mostly thin with a few broad faint
     // ones, each fading at its own depth.
     let seed = step * 7919;
