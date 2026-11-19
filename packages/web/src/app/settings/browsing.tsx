@@ -19,12 +19,7 @@ import {
 } from '@/lib/settings';
 import { SettingsCard } from './_components/settings-card';
 import { useTvosStyle } from '@/lib/tvos-style';
-import {
-  onDevice,
-  followsYou,
-  seconds,
-  deviceOnly,
-} from './_components/common';
+import { seconds, deviceOnly, DeviceOnly } from './_components/common';
 
 const NOTHING = 'none';
 
@@ -79,7 +74,7 @@ function HomeCard() {
   };
 
   return (
-    <SettingsCard name="home" title={t`Home`} description={followsYou()}>
+    <SettingsCard name="home" title={t`Home`} holds="profile">
       <Combobox
         multiple
         label={t`Featured on home`}
@@ -171,7 +166,7 @@ export function BrowsingSection() {
       <SettingsCard
         name="posters-and-grids"
         title={t`Posters and grids`}
-        description={followsYou()}
+        holds="profile"
       >
         {!tvos && (
           <Select
@@ -206,22 +201,20 @@ export function BrowsingSection() {
           onValueChange={setCombineSearch}
         />
         {!touch && !tvos && (
-          <Switch
-            side="right"
-            label={t`Preview the card you rest on`}
-            help={deviceOnly(
-              t`On home while the hero rotates, in search and in grids. Under a mouse a card pops out; with a keyboard or remote it opens out to its details.`
-            )}
-            value={cardPreview}
-            onValueChange={setCardPreview}
-          />
+          <DeviceOnly>
+            <Switch
+              side="right"
+              label={t`Preview the card you rest on`}
+              help={deviceOnly(
+                t`On home while the hero rotates, in search and in grids. Under a mouse a card pops out; with a keyboard or remote it opens out to its details.`
+              )}
+              value={cardPreview}
+              onValueChange={setCardPreview}
+            />
+          </DeviceOnly>
         )}
       </SettingsCard>
-      <SettingsCard
-        name="trailers"
-        title={t`Trailers`}
-        description={onDevice()}
-      >
+      <SettingsCard name="trailers" title={t`Trailers`} holds="device">
         <Combobox
           multiple
           label={t`Play by themselves`}
@@ -250,25 +243,25 @@ export function BrowsingSection() {
           onValueChange={setTrailerSound}
         />
       </SettingsCard>
-      <SettingsCard
-        name="episodes"
-        title={t`Episodes`}
-        description={followsYou()}
-      >
+      <SettingsCard name="episodes" title={t`Episodes`} holds="profile">
         {!tvos && (
-          <Select
-            label={t`Episode layout`}
-            help={deviceOnly(
-              t`Automatic lists episodes on narrow screens and puts them in a row on wide ones.`
-            )}
-            options={[
-              { value: 'auto', label: t`Automatic` },
-              { value: 'row', label: t`Row` },
-              { value: 'list', label: t`List` },
-            ]}
-            value={episodeLayout}
-            onValueChange={(value) => setEpisodeLayout(value as EpisodeLayout)}
-          />
+          <DeviceOnly>
+            <Select
+              label={t`Episode layout`}
+              help={deviceOnly(
+                t`Automatic lists episodes on narrow screens and puts them in a row on wide ones.`
+              )}
+              options={[
+                { value: 'auto', label: t`Automatic` },
+                { value: 'row', label: t`Row` },
+                { value: 'list', label: t`List` },
+              ]}
+              value={episodeLayout}
+              onValueChange={(value) =>
+                setEpisodeLayout(value as EpisodeLayout)
+              }
+            />
+          </DeviceOnly>
         )}
         {!tvos && (
           <Switch

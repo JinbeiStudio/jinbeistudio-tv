@@ -28,7 +28,7 @@ import { currentHost } from '@/lib/hosts';
 import { focusOn, keyboardFocus } from '@/lib/input';
 import { SettingsCard } from './_components/settings-card';
 import { Anchor } from '@/components/anchor';
-import { followsYou, onDevice, DOCS_URL } from './_components/common';
+import { DOCS_URL } from './_components/common';
 import { useTvosStyle } from '@/lib/tvos-style';
 import { InterfaceStylePicker } from '@/components/tvos/style-picker';
 
@@ -115,7 +115,7 @@ export function ThemeSection() {
       <SettingsCard
         name="colours"
         title={tvos ? t`Theme` : t`Colours`}
-        description={followsYou()}
+        holds="profile"
       >
         <InterfaceStylePicker />
         {!tvos && (
@@ -199,7 +199,7 @@ export function ThemeSection() {
       </SettingsCard>
       {!tvos && (
         <>
-          <SettingsCard name="glass" title={t`Glass`} description={onDevice()}>
+          <SettingsCard name="glass" title={t`Glass`} holds="device">
             <Select
               label={t`Glass surface`}
               help={t`What the navigation, and glass panels over the artwork, sit on: the app's own colour, or glass that shows the page through it. Liquid glass also bends what's behind the navigation's edges, which costs more on a slow device.`}
@@ -223,7 +223,7 @@ export function ThemeSection() {
               />
             )}
           </SettingsCard>
-          <SettingsCard name="css" title="CSS" description={followsYou()}>
+          <SettingsCard name="css" title="CSS" holds="profile">
             {server.css && (
               <Switch
                 side="right"

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "POT-Creation-Date: 2026-10-16 20:39+0100\n"
-"PO-Revision-Date: 2026-11-17 19:29+0000\n"
+"PO-Revision-Date: 2026-11-19 16:10+0000\n"
 "Last-Translator: Nicola Bortoletto <translate@nicolabortoletto.com>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/aiostreams/web-app/it/>\n"
 "Language: it\n"
@@ -480,8 +480,8 @@ msgid "Added to {name}"
 msgstr "Aggiunto a {name}"
 
 #: src/app/settings/account.tsx
-msgid "Addons, catalogs and users are set up on the configuration page."
-msgstr "Addon, cataloghi e utenti si configurano nella pagina delle impostazioni."
+msgid "Addons, catalogs and profiles are set up on the configuration page."
+msgstr "Addon, cataloghi e profili si impostano nella pagina di configurazione."
 
 #: src/app/settings/about.tsx
 msgid "Address"
@@ -835,7 +835,7 @@ msgstr "Dimensione cache"
 msgid "Calendar"
 msgstr "Calendario"
 
-#: src/app/servers/page.tsx
+#: src/app/servers/page.tsx src/app/sign-in/page.tsx
 msgid "Can’t reach"
 msgstr "Non raggiungibile"
 
@@ -1651,7 +1651,7 @@ msgstr "Ogni {list}"
 msgid "Every {list} at {time}"
 msgstr "Ogni {list} alle {time}"
 
-#: src/app/history/page.tsx
+#: src/app/history/page.tsx src/app/settings/page.tsx
 msgid "Everyone"
 msgstr "Tutti"
 
@@ -2137,7 +2137,7 @@ msgstr "Unisciti"
 
 #: src/features/party/not-in-party.tsx src/features/party/party-sheet.tsx
 msgid "Join a party"
-msgstr "Unisciti ad un watch party"
+msgstr "Unisciti a un watch party"
 
 #: src/features/party/not-in-party.tsx
 msgid "Joining leaves the party you're in."
@@ -2180,6 +2180,7 @@ msgid "Keeps the video playing in a small window when you leave the app."
 msgstr "Mantiene il video in riproduzione in una piccola finestra quando esci dall'app."
 
 #: src/app/settings/_components/common.tsx
+#: src/app/settings/_components/settings-card.tsx
 msgid "Kept on this device."
 msgstr "Memorizzato su questo dispositivo."
 
@@ -2232,6 +2233,10 @@ msgstr "Lasciare {from} per aggiungere {adding}?"
 #: src/app.tsx
 msgid "Leave {from} to open this on {target}?"
 msgstr "Lasciare {from} per aprire su {target}?"
+
+#: src/app/servers/page.tsx
+msgid "Leave off the profile picker"
+msgstr "Non mostrare la selezione del profilo"
 
 #: src/features/party/in-party.tsx
 msgid "Leave the party"
@@ -2350,6 +2355,10 @@ msgstr "Magenta"
 #: src/app/settings/audio.tsx
 msgid "Main"
 msgstr "Principale"
+
+#: src/app.tsx
+msgid "Manage servers"
+msgstr "Gestisci i server"
 
 #: src/features/versions/external-prompt.tsx
 msgid "Mark as watched"
@@ -2529,8 +2538,8 @@ msgid "Navigation"
 msgstr "Navigazione"
 
 #: src/app/sign-in/page.tsx
-msgid "Needed to switch to this user."
-msgstr "È necessario passare a questo utente."
+msgid "Needed to switch to this profile."
+msgstr "Necessario per passare a questo profilo."
 
 #: src/app/downloads/page.tsx
 msgid "Needs attention"
@@ -2847,7 +2856,7 @@ msgstr "Se disattivato, il trailer viene comunque riprodotto con l'audio quando 
 
 #: src/features/party/in-party.tsx
 msgid "Off, the video jumps instead."
-msgstr "Disattivato, il video invece salta."
+msgstr "Disattivato, il video salta."
 
 #: src/components/shell/usage-stats.tsx
 msgid "OK"
@@ -3045,8 +3054,8 @@ msgid "Other pages, such as settings"
 msgstr "Altre pagine, come le impostazioni"
 
 #: src/app/sign-in/page.tsx
-msgid "Other user"
-msgstr "Altro utente"
+msgid "Other profile"
+msgstr "Altro profilo"
 
 #: src/app/player/page.tsx
 msgid "Other versions"
@@ -3168,10 +3177,6 @@ msgstr "In pausa su {name}, a {at}"
 #: src/app/settings/playback.tsx
 msgid "Pauses and asks before the next episode once this many have played in a row without a key, click or button press."
 msgstr "Mette in pausa e chiede conferma prima dell'episodio successivo dopo che questo numero di episodi è stato riprodotto di seguito senza alcuna pressione di tasti o clic."
-
-#: src/app/settings/player.tsx
-msgid "Pausing, playing or skipping with a remote or the keyboard brings the controls up, for a moment after a skip. Turned off, only a brief icon shows."
-msgstr "Mettere in pausa, riprodurre o saltare con un telecomando o con la tastiera fa comparire i controlli, per un istante dopo un salto. Se disattivato, compare solo una breve icona."
 
 #: src/app/search/page.tsx
 msgid "People"
@@ -3522,6 +3527,10 @@ msgstr "Trailer precedente"
 #: src/components/media/people.tsx
 msgid "Producer"
 msgstr "Produttore"
+
+#: src/app/history/page.tsx
+msgid "Profile"
+msgstr "Profilo"
 
 #: src/app/settings/_components/shortcut-settings.tsx
 msgid "Puts every key back the way it came."
@@ -3920,11 +3929,15 @@ msgstr "Salvato"
 msgid "Saved to {folder}"
 msgstr "Salvato in {folder}"
 
-#: src/app/settings/_components/common.tsx
+#: src/app/settings/_components/settings-card.tsx
+msgid "Saved to this profile, on every device it signs in on."
+msgstr "Salvato in questo profilo, su ogni dispositivo in cui accede."
+
+#: src/app/settings/_components/settings-card.tsx
 msgid "Saved to your account, so it follows you to every device."
 msgstr "Salvato nel tuo account, per seguirti su ogni dispositivo."
 
-#: src/app/settings/_components/common.tsx
+#: src/app/settings/_components/settings-card.tsx
 msgid "Saved to your account, so your other devices and Jellyfin apps use it too."
 msgstr "Salvato nel tuo account, così gli altri dispositivi e l'app Jellyfin lo useranno a loro volta."
 
@@ -4071,6 +4084,10 @@ msgstr "Imposta a mano"
 msgid "Settings"
 msgstr "Impostazioni"
 
+#: src/app/settings/page.tsx
+msgid "Settings for"
+msgstr "Impostazioni per"
+
 #: src/app/settings/player.tsx
 msgid "Shader files (.wgsl) for the WebGPU engine, applied in name order to what plays. They stay in this browser. Heavy ones can make video stutter."
 msgstr "File shader (.wgsl) per il motore WebGPU, applicati in ordine alfabetico a ciò che viene riprodotto. Restano in questo browser. Quelli più pesanti possono causare scatti nel video."
@@ -4120,6 +4137,10 @@ msgstr "Mostra nella cartella"
 msgid "Show messages over the video"
 msgstr "Mostra i messaggi sopra il video"
 
+#: src/app/servers/page.tsx
+msgid "Show on the profile picker"
+msgstr "Mostra nella selezione del profilo"
+
 #: src/app/settings/playback.tsx
 msgid "Show reactions over the video"
 msgstr "Mostra le reazioni sopra il video"
@@ -4135,10 +4156,6 @@ msgstr "Mostra i sottotitoli in anticipo"
 #: src/features/player/options.tsx
 msgid "Show subtitles later"
 msgstr "Mostra i sottotitoli in ritardo"
-
-#: src/app/settings/player.tsx
-msgid "Show the controls on pause and skip"
-msgstr "Mostra i controlli in pausa o durante i salti"
 
 #: src/app/settings/playback.tsx
 msgid "Show the prompt"
@@ -4585,14 +4602,14 @@ msgstr "Scorri verso l'alto o il basso a destra per il volume"
 msgid "Switch"
 msgstr "Cambia"
 
+#: src/app/settings/account.tsx src/components/media/no-catalogs.tsx
+#: src/components/shell/layout.tsx
+msgid "Switch profile"
+msgstr "Cambia profilo"
+
 #: src/app.tsx
 msgid "Switch server"
 msgstr "Cambia server"
-
-#: src/app/settings/account.tsx src/components/media/no-catalogs.tsx
-#: src/components/shell/layout.tsx
-msgid "Switch user"
-msgstr "Cambia utente"
 
 #: src/app/settings/player.tsx
 msgid "Switches the TV to a refresh rate that suits each video, so motion plays smoothly, and back when you stop. The screen goes blank for a moment as it switches."
@@ -4778,6 +4795,14 @@ msgstr "Il lettore dell'app e le sue opzioni, come l'avvio dei video in modalit�
 #: src/app/settings/theme.tsx
 msgid "The artwork of the title you're on, blurred and darkened, behind these pages. The version list shows it with title pages."
 msgstr "Mostra la copertina del titolo selezionato, sfocata e resa più scura, sullo sfondo di queste pagine. L'elenco delle versioni la mostra insieme alle pagine del titolo."
+
+#: src/app/settings/_components/settings-card.tsx
+msgid "The default for every device. A device that changes it keeps its own."
+msgstr "Il valore predefinito per ogni dispositivo. Un dispositivo che lo modifica mantiene il proprio."
+
+#: src/app/settings/_components/settings-card.tsx
+msgid "The default for every profile. A profile that changes it keeps its own."
+msgstr "Il valore predefinito per ogni profilo. Un profilo che lo modifica mantiene il proprio."
 
 #: src/app/settings/account.tsx
 msgid "The device is signed in"
@@ -5032,6 +5057,10 @@ msgstr "Questo non è un file pass .wgsl."
 msgid "This item was not found"
 msgstr "Elemento non trovato"
 
+#: src/app/sign-in/page.tsx
+msgid "This profile has a PIN."
+msgstr "Questo profilo richiede un PIN."
+
 #: src/features/downloads/download-button.tsx
 msgid "This season"
 msgstr "Questa stagione"
@@ -5044,7 +5073,7 @@ msgstr "Questo server"
 msgid "This server can't list what you've watched."
 msgstr "Questo server non può mostrare i contenuti che hai guardato."
 
-#: src/app/settings/_components/common.tsx
+#: src/app/settings/_components/settings-card.tsx
 msgid "This server doesn't let your account change these."
 msgstr "Questo server non consente al tuo account di modificare queste impostazioni."
 
@@ -5079,10 +5108,6 @@ msgstr "Impossibile riprodurre questo trailer: {failure}"
 #: src/app/trailer/page.tsx
 msgid "This trailer is gone."
 msgstr "Trailer non disponibile."
-
-#: src/app/sign-in/page.tsx
-msgid "This user has a PIN."
-msgstr "Questo utente richiede un PIN."
 
 #: src/app/player/page.tsx
 msgid "This version is no longer available."
@@ -5349,10 +5374,6 @@ msgstr "Usa il tuo nome utente e PIN, oppure lo UUID della configurazione e la r
 msgid "Used when an episode has no credits marked."
 msgstr "Utilizzati quando un episodio non ha i titoli di coda contrassegnati."
 
-#: src/app/history/page.tsx
-msgid "User"
-msgstr "Utente"
-
 #: src/app/sign-in/page.tsx
 msgid "User name"
 msgstr "Nome utente"
@@ -5408,7 +5429,7 @@ msgstr "Le versioni vengono riprodotte nel browser. Scegli un altro lettore se p
 
 #: src/app/settings/page.tsx
 msgid "Versions, next episode and skipping"
-msgstr "Versioni, episodio successivo e salto"
+msgstr "Versioni, episodio successivo e opzioni di salto"
 
 #: src/app/settings/player.tsx
 msgid "Video"
@@ -5488,8 +5509,8 @@ msgid "Watch along"
 msgstr "Guarda in compagnia"
 
 #: src/app/settings/account.tsx
-msgid "Watch as someone else on this configuration. A user with a PIN needs it again after switching away."
-msgstr "Guarda come un altro utente su questa configurazione. Un utente con PIN dovrà inserirlo nuovamente dopo aver cambiato profilo."
+msgid "Watch as someone else on this configuration. A profile with a PIN needs it again after switching away."
+msgstr "Guarda come un altro utente su questa configurazione. Un profilo con PIN dovrà inserirlo nuovamente dopo aver cambiato profilo."
 
 #: src/app/settings/playback.tsx
 msgid "Watch parties"
@@ -5504,7 +5525,7 @@ msgstr "Watch party"
 #: src/features/party/in-party.tsx src/features/party/party-sheet.tsx
 #: src/features/player/options.tsx
 msgid "Watch together"
-msgstr "Visione condivisa"
+msgstr "Guarda insieme"
 
 #: src/app/discover/page.tsx src/app/history/page.tsx
 #: src/app/item/_components/actions.tsx
@@ -5576,8 +5597,8 @@ msgid "What you can send from a party's chat."
 msgstr "Contenuti che puoi inviare all'interno della chat di un watch party."
 
 #: src/app/settings/apps.tsx
-msgid "What your Discord profile shows. Kept on this device."
-msgstr "Le informazioni mostrate nel tuo profilo Discord. Salvate su questo dispositivo."
+msgid "What your Discord profile shows."
+msgstr "Le informazioni mostrate nel tuo profilo Discord."
 
 #: src/app/settings/audio.tsx
 msgid "What your speakers or receiver take. Surround sound with more is mixed down, with its dialogue kept in."
@@ -5625,7 +5646,7 @@ msgstr "Quando il TV o il ricevitore decodificano"
 
 #: src/app/settings/playback.tsx
 msgid "Where a file names its intro, credits, recap or preview chapters, skipping uses them instead of the server's times, since they fit that exact file. The rest still come from the server."
-msgstr "Se un file indica le sigle, i titoli di coda, il riepilogo o l’anteprima, la funzione di salto utilizza questi dati anziché i tempi forniti dal server, poiché sono specifici di quel file. Per tutto il resto, continua a utilizzare i dati del server."
+msgstr "Se un file indica le sigle, i titoli di coda, il riassunto o l’anteprima, la funzione di salto utilizza questi dati anziché quelli forniti dal server, in quanto sono più precisi. Per tutto il resto verranno comunque usati i dati del server."
 
 #: src/app/settings/about.tsx
 msgid "Where the app is made, and where to report a problem."
@@ -5727,7 +5748,7 @@ msgstr "Giallo"
 msgid "Yesterday"
 msgstr "Ieri"
 
-#: src/components/shell/nav/account.tsx
+#: src/app/settings/page.tsx src/components/shell/nav/account.tsx
 #: src/components/shell/nav/corner-menu.tsx
 #: src/components/shell/nav/mobile-nav.tsx
 #: src/components/shell/nav/touch-rail.tsx src/components/shell/nav/tv-rail.tsx
