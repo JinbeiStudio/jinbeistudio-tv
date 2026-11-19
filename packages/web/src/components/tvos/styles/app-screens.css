@@ -293,6 +293,10 @@ html[data-tvos-build] [data-ui='settings-tab-group'] {
   border-radius: 1.4vw !important;
   background: rgba(255, 255, 255, 0.05) !important;
 }
+/* Upstream scrolls the section list on its own; tvOS lists show no scrollbar. */
+html[data-tvos-build] [data-ui='settings-tabs'] {
+  scrollbar-width: none;
+}
 html[data-tvos-build] [data-ui='settings-tab'] {
   /* Focus jumps, as tvOS lists: the app's 0.2 s fade left the old section's white behind like a ghost. */
   transition: none !important;

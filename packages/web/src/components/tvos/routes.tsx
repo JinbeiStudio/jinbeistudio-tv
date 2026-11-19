@@ -1,6 +1,7 @@
 /* eslint-disable lingui/no-unlocalized-strings -- the tvOS style's words go through tr() (./i18n), which this rule doesn't know */
 import React from 'react';
 import { Outlet, useChildMatches } from '@tanstack/react-router';
+import type { PageView } from '@/components/shell/page-stack';
 
 // The tvOS style's own pages, loaded only when it is chosen.
 const TvosItem = React.lazy(() =>
@@ -32,6 +33,7 @@ interface Match {
   routeId: string;
   params: Record<string, string | undefined>;
   search: Record<string, string | undefined>;
+  staticData: { page?: PageView };
 }
 
 /**
@@ -42,7 +44,20 @@ export function TvosOutlet() {
   const match = useChildMatches({
     select: (matches) => matches[0] as unknown as Match | undefined,
   });
-  return (match && tvosPage(match)) ?? <Outlet />;
+  if (!match) return <Outlet />;
+  // The app's pages that its own page stack draws have no route component.
+  const page = match.staticData.page;
+  return (
+    tvosPage(match) ??
+    (page ? (
+      page({
+        params: match.params as Record<string, string>,
+        search: match.search,
+      })
+    ) : (
+      <Outlet />
+    ))
+  );
 }
 
 const PATHS = [
