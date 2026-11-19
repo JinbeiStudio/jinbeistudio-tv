@@ -36,6 +36,7 @@ import { VersionPickerProvider } from '@/features/versions/version-picker';
 import { WatchNextSync } from '@/components/shell/watch-next';
 import { GlideLayers } from '@/components/shell/glide-layers';
 import { PinnedTargets } from './parts';
+import { VersionFallback } from './version-fallback';
 import { BiChevronLeft, BiChevronRight } from 'react-icons/bi';
 import { MenuOpener, Pinned, useHideSea } from './parts';
 import { tr } from './i18n';
@@ -478,6 +479,7 @@ export function TvosLayout() {
         <VersionPickerProvider>
           <RemoteTarget />
           <ReminderHost />
+          <VersionFallback />
           <RandomPick />
           <PlaylistsHost />
           {currentHost().watchNext && <WatchNextSync />}
