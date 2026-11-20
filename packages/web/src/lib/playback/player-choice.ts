@@ -161,8 +161,14 @@ export function playerSupport(): { headers: boolean; youtube: boolean } {
   };
 }
 
+// Read before the WebGPU player loads and patches it in: browsers without it (Safari 27.0) fail in that player.
+const nativeDispose = typeof Symbol.dispose === 'symbol';
+
 /** Each version is still checked as it opens. */
 export const canPlayWithWebGpu = () =>
+  // webOS has no adapter, and its failed try leaves LG's player refusing Dolby audio.
+  currentHost().name !== 'webos' &&
+  nativeDispose &&
   isSecureContext &&
   'gpu' in navigator &&
   typeof VideoDecoder === 'function' &&
