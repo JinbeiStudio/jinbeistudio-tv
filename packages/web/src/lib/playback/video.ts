@@ -64,7 +64,11 @@ async function openHls(
   const hls = new Hls({
     startPosition: file.source.IsInfiniteStream ? -1 : file.startMs / 1000,
     // A short trailer would be over before the default guess climbed past its lowest picture.
-    ...(quick && { abrEwmaDefaultEstimate: 5_000_000 }),
+    // YouTube's VP9 group stops at 360p, and hls.js would stay in it; its H.264 one goes to 1080p.
+    ...(quick && {
+      abrEwmaDefaultEstimate: 5_000_000,
+      videoPreference: { videoCodec: 'avc1' },
+    }),
   });
   hls.on(Hls.Events.ERROR, (_, data) => {
     if (data.fatal)
