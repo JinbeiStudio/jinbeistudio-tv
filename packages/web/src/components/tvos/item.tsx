@@ -21,7 +21,6 @@ import {
   useEpisodes,
   useItem,
   useNextUpFor,
-  useItemPages,
   useSeasons,
   useShowAhead,
   useSimilar,
@@ -91,6 +90,7 @@ import {
 } from './parts';
 import { tr } from './i18n';
 import { useTvosTrailer, type TvosTrailer } from './trailer';
+import { CollectionMembers, CollectionVideo } from './collection';
 import { trailersOf } from '@/lib/playback/trailers';
 
 /**
@@ -154,16 +154,6 @@ export function TvosItem({
   const setPlayed = useSetPlayed();
   const setFavorite = useSetFavorite();
   const boxset = item?.Type === 'BoxSet';
-  const members = useItemPages(itemId, {
-    types: 'Movie,Series',
-    enabled: boxset,
-  });
-  const memberItems = members.data?.pages.flatMap((p) => p.Items ?? []) ?? [];
-  // A collection is shown whole, its later pages following the first.
-  const { hasNextPage, isFetchingNextPage, fetchNextPage } = members;
-  React.useEffect(() => {
-    if (hasNextPage && !isFetchingNextPage) void fetchNextPage();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
   const setDropped = useSetDropped();
   const canDrop = useFeature('dropped');
   const inParty = !!useParty();
@@ -463,13 +453,7 @@ export function TvosItem({
           )}
           {/* Below the episodes, drawn once scrolled near, so the page opens light. */}
           <Later room="25vw">
-            {boxset && memberItems.length > 0 && (
-              <Row title={tr('In this collection')}>
-                {memberItems.map((m) => (
-                  <PosterCard key={m.Id} item={m} />
-                ))}
-              </Row>
-            )}
+            {boxset && item && <CollectionMembers item={item} />}
             {!!item?.People?.length && (
               <Row title={tr('Cast & Crew')}>
                 {item.People.map((p, i) => (
@@ -529,6 +513,10 @@ function ItemBackdrop({
   return (
     <>
       <Backdrop {...props} lowered={lowered} ambient />
+      <CollectionVideo
+        item={props.item}
+        shown={!lowered && !props.waiting && !playing && !loading}
+      />
       {trailer.preview}
     </>
   );
