@@ -309,7 +309,8 @@ export function videoEngine(
         el && videoSurface(el),
         { delayMs, height },
         {
-          assFailed,
+          // webOS's video never reports its frames, which libass draws on, so its ASS shows as text.
+          assFailed: assFailed || !!native,
           onAssFail() {
             assFailed = true;
             setSubtitle(id);
