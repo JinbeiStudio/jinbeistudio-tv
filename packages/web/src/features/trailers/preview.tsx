@@ -110,18 +110,25 @@ function probe(): Probe {
   });
 }
 
+/** Whether trailers may start by themselves in `spot` at all, whatever is happening now. */
+export function useTrailersAllowed(spot: TrailerSpot): boolean {
+  const [on] = useSetting(settings.interface.trailer[spot]);
+  const still = useReducedMotion();
+  return on && !still && !saveData() && probe().framed;
+}
+
 /** Whether trailers may start by themselves in `spot` here and now. */
 export function useTrailersOn(spot: TrailerSpot): boolean {
-  const [on] = useSetting(settings.interface.trailer[spot]);
-  return useTrailersCan() && on;
+  const allowed = useTrailersAllowed(spot);
+  return useTrailersCan() && allowed;
 }
 
 /** Whether a trailer can play in a box of the page here and now, asked for or not. */
 export function useTrailersCan(): boolean {
+  const still = useReducedMotion();
   const shown = usePageShown();
   const playback = usePlayback();
   const party = useParty();
-  const still = useReducedMotion();
   const visible = React.useSyncExternalStore(
     visibility.subscribe,
     visibility.get
